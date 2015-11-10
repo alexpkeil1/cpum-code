@@ -1,0 +1,207 @@
+generated quantities{
+// This section is for sampling from the posterior predictive distribution - 
+// person time works differently in this section from the data.
+// Late entry is maintained, but individuals are kept in the data until
+// censoring (by end of study or reaching the max age). 
+// Death is assigned as a probability, rather than a binary variable 
+// so an individual can be kept in the dataset since they represent
+// the discrete hazard of dying, rather than representing a specific individual
+// Thus, the total person time in this section is expanded beyond the original data
+// and some variables are given different names to correspond to each variable
+// over the expanded person-time. For example, cohort_1 becomes cohort_1_full
+// because they are just vectors of different lengths that correspond to the
+// total person-time vector of the cohort_1 variable in the observed/posterior data.
+// Not all of these name switches are intuitive (cumwlm becomes cumx), but I will clean
+// them up as I have time to work over the code.
+
+    //summary functions
+    real surv_nc[J];
+    real cilc_nc[J];
+    real cinlc_nc[J];
+    real meanCumX;
+    real meanWkyrs;
+    real y_nc[J];
+    real ylc[J];
+    real ynlc[J];
+
+{ // local scope
+    real meanX[J];
+    int R[J]; //count of risk set
+
+    int lswitch;
+    
+    real xhat[obs]; //exposure
+    real lhat[obs]; //employment status
+    real leftworkf[obs]; //employment status
+    real h_lcn[obs];
+    real h_nlcn[obs];
+    //
+    real cumx[obs];
+    real cumxcen[obs];
+    real cuml[obs];
+    real cumlcen[obs];
+    real cumx2lag[obs];
+    real cumx2lagcen[obs];
+    real cumx5lag[obs];
+    real lhat5lag[obs];
+    real lhat2lag[obs];
+    
+    
+    ///// variables from the original data + full data counterparts: ////
+    // cumwlmcen = cumxcen
+    // cumwlm2lagcen = cumx2lagcen
+    // ageout = time_full
+    // ageoutcen = time_fullcen
+    // cohort_1 = cohort_1_full
+    // cumatworkcen = cumlcen
+    // BL_cumatwork = BL_cumatworkfull
+    // BL_cumwlmcen = BL_cumwlm_full
+    // BL_cumatworkcen = BL_cumatworkfullcen
+    // BL_cumwlmcencen = BL_cumwlm_fullcen
+    // atwork = lhat
+    // wlm = xhat
+    // leftwork = leftworkf
+    /////////////////////////////////////////////////////////////////////
+    //initilialize lagged, cumulative variables
+    meanCumX <- 0;
+    meanWkyrs <- 0;
+    for(n in 1:obs){
+        cumx[n] <- 0; // cumulative exposure
+        cuml[n] <- 0;  // cumulative time at work
+        cumxcen[n] <- 0; // cumulative exposure
+        cumlcen[n] <- 0;  // cumulative time at work
+        cumx5lag[n] <- 0;
+        cumx2lag[n] <- 0;
+        cumx2lagcen[n] <- 0;
+        lhat5lag[n] <- 0;
+        lhat2lag[n] <- 0;
+        lhat[n] <- 0;
+    }
+    //initialize potential average rates, mean exposure
+    for(k in 1:J){
+    	R[k] <- 0;
+        ylc[k] <- 0;
+        ynlc[k] <- 0;
+        meanX[k] <- 0;
+    }
+   //note: this can be done more efficiently in terms of looping, but it will save on drive space
+   //using likelihood to generate potential expected covariate, outcomes
+    for (n in 1:obs){
+        ////////
+        //employment status
+        ////////
+        //work status treated like a binary switch that starts on the 'on' position and can only be
+        // turned off once
+    	if(n==1 || id_full[n] != id_full[n-1]){
+    	  lhat[n] <- 1;
+    	  lswitch <- 1;
+    	}
+    	if(lswitch==1){
+        leftworkf[n] <- bernoulli_rng(inv_logit(
+            g0 + g[1]*BL_cumwlm_fullcen[n] + g[2]*BL_cumatwork_fullcen[n] + g[3]*cohort_1_full[n] + g[4]*cumlcen[n] + 
+            g[5]*cumx2lagcen[n] + g[6]*time_fullcen[n] + g[7]*time_fullcen[n]*time_fullcen[n] +
+            g[8]*year_fullcen[n] + g[9]*year_fullcen[n]*year_fullcen[n]
+        ));
+        if(n==1 || id_full[n] != id_full[n-1]) leftworkf[n] <- 0; // can't actually leave first time point
+        if(leftworkf[n]==1){
+        	lhat[n] <- 0;
+        	lswitch <- 0;
+        }
+        else lhat[n] <- 1;
+        } //lswitch=1
+         else { // if lswitch=0 (not at work)
+            leftworkf[n] <- 0;
+            lhat[n] <- 0;
+        }
+
+        ////////
+        //exposure
+        ////////
+        if(lhat[n]==1){
+            xhat[n] <- 1000*exp(normal_rng(
+            a0 + a[1]*BL_cumwlm_fullcen[n] + a[2]*BL_cumatwork_fullcen[n] + a[3]*cohort_1_full[n] + a[4]*cumlcen[n] + 
+            a[5]*cumx2lagcen[n] + a[6]*time_fullcen[n] + a[7]*time_fullcen[n]*time_fullcen[n] +
+            a[8]*year_fullcen[n] + a[9]*year_fullcen[n]*year_fullcen[n]
+         , sigma2
+        ));
+        }
+        else if(lhat[n]==0) xhat[n] <- 0;
+    
+    //cumulative, lag variables
+    if(n>1 && id_full[n]==id_full[n-1]){
+        cumx[n] <- cumx[n-1] + xhat[n];
+        cuml[n] <- cuml[n-1] + lhat[n];
+        cumlcen[n] <- (cuml[n]-meancumatwork)/sdcumatwork;
+    }
+    if(n>5 && id_full[n]==id_full[n-5]){
+        cumx5lag[n] <- cumx[n-5];
+        lhat5lag[n] <- lhat[n-5];
+    }
+    if(n>2 && id_full[n]==id_full[n-2]){
+        lhat2lag[n] <- lhat[n-2];
+        cumx2lag[n] <- cumx[n-2];
+        cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag;
+    }
+    ////////
+    //lung cancer mortality
+    ////////
+
+    h_lcn[n] <- inv_logit(
+        b0 + b[1]*BL_cumwlm_fullcen[n] + b[2]*BL_cumatwork_fullcen[n] + b[3]*cohort_1_full[n] + b[4]*cumlcen[n] + 
+        b[5]*lhat2lag[n] + b[6]*cumx2lagcen[n] + b[7]*time_fullcen[n] + b[8]*time_fullcen[n]*time_fullcen[n] +
+        b[9]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] +
+        b[10]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] + 
+        b[11]*lhat[n]*cumx2lagcen[n] +
+        b[12]*cumlcen[n]*cumlcen[n] +
+        b[13]*year_fullcen[n] + b[14]*year_fullcen[n]*year_fullcen[n]
+   );
+    ////////
+    //all other cause mortality
+    ////////
+    h_nlcn[n] <- inv_logit(
+        c0 + c[1]*BL_cumwlm_fullcen[n] + c[2]*BL_cumatwork_fullcen[n] + c[3]*cohort_1_full[n] + c[4]*cumlcen[n] + 
+        c[5]*lhat2lag[n] + c[6]*cumx2lagcen[n] + c[7]*time_fullcen[n] + c[8]*time_fullcen[n]*time_fullcen[n] + 
+        c[9]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] + 
+        c[10]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] + 
+        c[11]*lhat[n]*cumx2lagcen[n] +
+        c[12]*cumlcen[n]*cumlcen[n] +
+        c[13]*year_fullcen[n] + c[14]*year_fullcen[n]*year_fullcen[n]
+    );
+    
+    
+    //natural course
+    for (k in 1:J){
+    //loop over time of interest for inference (will essentially drop observations if they occur outside of this window)
+        if(time_full[n]==(k+minT-1)){
+            //risk set size
+            R[k] <- R[k] + 1;
+            //these will be averaged below
+            ylc[k] <- ylc[k] + h_lcn[n];
+            ynlc[k] <- ynlc[k] + h_nlcn[n];
+            meanX[k] <- meanX[k] + xhat[n];
+    	} //time_full
+    } // k in 1:J
+    if(time_full[n]==maxT || time_full[n]==maxage_full[n]) {
+     	meanCumX <- meanCumX + cumx[n]/N;
+     	meanWkyrs <- meanWkyrs + cuml[n]/N;
+     }
+    } // n in 1:obs
+    for (k in 1:J){
+        //take average over risk set (average rate)
+        ylc[k] <- ylc[k]/R[k];
+        ynlc[k] <- ynlc[k]/R[k];
+        meanX[k] <- meanX[k]/R[k];
+        y_nc[k] <- ylc[k] + ynlc[k];
+    }
+    // calculate survival, survival difference, risk difference under interventions
+    surv_nc[1]    <- 1 - (ylc[1] + ynlc[1]);
+    cilc_nc[1]  <- ylc[1];
+    cinlc_nc[1] <-  ynlc[1];
+    for (k in 2:J){
+        surv_nc[k]  <-                   (1-(ylc[k] + ynlc[k]))*(surv_nc[k-1]);
+        cilc_nc[k]  <-   cilc_nc[k-1]  + (   ylc[k]           )*(surv_nc[k-1]); 
+        cinlc_nc[k] <-   cinlc_nc[k-1] + (            ynlc[k] )*(surv_nc[k-1]); 
+    }
+}// end local scope
+
+}
