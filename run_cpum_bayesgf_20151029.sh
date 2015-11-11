@@ -37,7 +37,7 @@ cd ~/EpiProjects/CPUM/code/
 #remove time-fixed, cal time: 0.13
 #after fixing centering issue: .26
 #after fixing employment status post 1977: 0.25
-#after fixing the accumulation of exposure
+#giving baseline, exposure, work time more polynomial terms: 0.11 (lp =  -8563.5)
 #time only: 0.092
 
 
@@ -59,7 +59,7 @@ cd ~/EpiProjects/CPUM/code/
 #remove time-fixed, cal time: 0.19
 #after fixing centering issue: 0.17
 #after fixing employment status post 1977: 0.18
-#after fixing the accumulation of exposure
+#giving baseline, exposure, work time more polynomial terms: 
 #time only: 0.16
 
 

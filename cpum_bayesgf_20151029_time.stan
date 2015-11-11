@@ -56,7 +56,6 @@ transformed data{
     row_vector[obscomplete] cumwlm2lagcen;
     row_vector[obscomplete] sqrt_cumwlm2lag;
     row_vector[obscomplete] sqrt_BL_cumwlm;
-    
 
     row_vector[obs] age_fullcen;
     row_vector[obs] date_fullcen;
@@ -134,10 +133,10 @@ parameters{
     real c0;
     real g0;
     real<lower=0> sigma2;
-    real a[12];  // exposure
-    real g[10];  // employment
-    real b[14]; // lung cancer
-    real c[14]; // all other causes
+    real a[16];  // exposure
+    real g[16];  // employment
+    real b[16]; // lung cancer
+    real c[16]; // all other causes
 }
 transformed parameters{
 }
@@ -160,16 +159,22 @@ model{
         if((atwork[n]==1 || leftwork[n]==1) && dateout[n] < 1977.5){
         leftwork[n] ~ bernoulli_logit(
 g0 +
-g[1]*sqrt(BL_cumwlm[n]) +
-//g[2]*BL_cumyrsexpcen[n] +
-g[3]*cumyrsexp2lagcen[n] +
-g[4]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
-g[5]*cumwlm2lagcen[n] +
-g[6]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
-g[7]*ageoutcen[n] +
-g[8]*ageoutcen[n]*ageoutcen[n]  +
-g[9]*dateoutcen[n] +
-g[10]*dateoutcen[n]*dateoutcen[n]
+g[1] * BL_cumwlmcen[n] +
+g[2] * BL_cumwlmcen[n] * BL_cumwlmcen[n] +
+g[3] * BL_cumwlmcen[n] * BL_cumwlmcen[n]* BL_cumwlmcen[n] +
+g[4] * BL_cumyrsexpcen[n] +
+g[5] * BL_cumyrsexpcen[n] * BL_cumyrsexpcen[n]+
+g[6] * BL_cumyrsexpcen[n] * BL_cumyrsexpcen[n] * BL_cumyrsexpcen[n]+
+g[7] * cumyrsexp2lagcen[n] +
+g[8] * cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+g[9] * cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+g[10] * cumwlm2lagcen[n] +
+g[11] * cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+g[12] * cumwlm2lagcen[n]*cumwlm2lagcen[n] * cumwlm2lagcen[n]  +
+g[13] * ageoutcen[n] +
+g[14] * ageoutcen[n]*ageoutcen[n]  +
+g[15] * dateoutcen[n] +
+g[16] * dateoutcen[n]*dateoutcen[n] 
        );
         } else increment_log_prob(0);
 
@@ -179,18 +184,22 @@ g[10]*dateoutcen[n]*dateoutcen[n]
         if(atwork[n]==1 && wlm[n]>0){
         log(wlm[n]/1000) ~ normal(
 a0 +
-a[1]*sqrt(BL_cumwlm[n]) +
-//a[2]*BL_cumyrsexpcen[n] +
-a[3]*cumyrsexp2lagcen[n] +
-a[4]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
-a[5]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
-a[6]*cumwlm2lagcen[n] +
-a[7]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
-a[8]*cumwlm2lagcen[n]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
-a[9]*ageoutcen[n] +
-a[10]*ageoutcen[n]*ageoutcen[n] +
-a[11]*dateoutcen[n] +
-a[12]*dateoutcen[n]*dateoutcen[n]
+a[1] * BL_cumwlmcen[n] +
+a[2] * BL_cumwlmcen[n] .* BL_cumwlmcen[n]+
+a[3] * BL_cumwlmcen[n] .* BL_cumwlmcen[n] .* BL_cumwlmcen[n] +
+a[4] * BL_cumyrsexpcen[n] +
+a[5] * BL_cumyrsexpcen[n]  .* BL_cumyrsexpcen[n]+
+a[6] * BL_cumyrsexpcen[n] .* BL_cumyrsexpcen[n] .* BL_cumyrsexpcen[n] +
+a[7] * cumyrsexp2lagcen[n] +
+a[8] * cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+a[9] * cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+a[10] * cumwlm2lagcen[n] +
+a[11] * cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+a[12] * cumwlm2lagcen[n]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+a[13] * ageoutcen[n] +
+a[14] * ageoutcen[n]*ageoutcen[n] +
+a[15] * dateoutcen[n] +
+a[16] * dateoutcen[n]*dateoutcen[n]
             , sigma2
             );
         } else increment_log_prob(0);
@@ -204,38 +213,44 @@ a[12]*dateoutcen[n]*dateoutcen[n]
         ////////
         d_lc ~ bernoulli_logit(
 b0 +
-b[1]*sqrt_BL_cumwlm +
-//b[2]*BL_cumyrsexpcen +
-b[3]*cumyrsexpcen +
-b[4]* cumyrsexpcen .* cumyrsexpcen +
-b[5]*atwork2lag +
-b[6]*sqrt_cumwlm2lag +
-b[7]*ageoutcen +
-b[8]*ageoutcen .* ageoutcen +
-b[9]*ageoutcen .* ageoutcen .* ageoutcen +
-b[10]*ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
-b[12]*dateoutcen +
-b[13]*dateoutcen .* dateoutcen +
-b[14]*dateoutcen .* dateoutcen .* dateoutcen
+b[1] * BL_cumwlmcen +
+b[2] * BL_cumwlmcen .* BL_cumwlmcen +
+b[3] * BL_cumyrsexpcen +
+b[4] * BL_cumyrsexpcen .* BL_cumyrsexpcen +
+b[5] * cumyrsexpcen +
+b[6] * cumyrsexpcen .* cumyrsexpcen +
+b[7] * atwork2lag +
+b[8] * cumwlm2lagcen +
+b[9] * cumwlm2lagcen .* cumwlm2lagcen +
+b[10] * ageoutcen +
+b[11] * ageoutcen .* ageoutcen +
+b[12] * ageoutcen .* ageoutcen .* ageoutcen +
+b[13] * ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
+b[14] * dateoutcen +
+b[15] * dateoutcen .* dateoutcen +
+b[16] * dateoutcen .* dateoutcen .* dateoutcen
         );
         ////////
         // all other cause mortality model
         ////////
         d_nonlc ~ bernoulli_logit(
 c0 +
-c[1]*sqrt_BL_cumwlm +
-//c[2]*BL_cumyrsexpcen +
-c[3]*cumyrsexpcen +
-c[4]* cumyrsexpcen .* cumyrsexpcen +
-c[5]*atwork2lag +
-c[6]*sqrt_cumwlm2lag +
-c[7]*ageoutcen +
-c[8]*ageoutcen .* ageoutcen +
-c[9]*ageoutcen .* ageoutcen .* ageoutcen  +
-c[10]*ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
-c[12]*dateoutcen +
-c[13]*dateoutcen .* dateoutcen +
-c[14]*dateoutcen .* dateoutcen .* dateoutcen
+c[1] * BL_cumwlmcen +
+c[2] * BL_cumwlmcen .*BL_cumwlmcen+
+c[3] * BL_cumyrsexpcen +
+c[4] * BL_cumyrsexpcen .*BL_cumyrsexpcen+
+c[5] * cumyrsexpcen +
+c[6] * cumyrsexpcen .* cumyrsexpcen +
+c[7] * atwork2lag +
+c[8] * cumwlm2lagcen +
+c[9] * cumwlm2lagcen .* cumwlm2lagcen+
+c[10] * ageoutcen +
+c[11] * ageoutcen .* ageoutcen +
+c[12] * ageoutcen .* ageoutcen .* ageoutcen  +
+c[13] * ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
+c[14] * dateoutcen +
+c[15] * dateoutcen .* dateoutcen +
+c[16] *  dateoutcen .* dateoutcen .* dateoutcen
         );
 
 
@@ -378,16 +393,22 @@ for(interv in 1:4){
             // work[n] = 1-probability of leaving work
             lhat[n] <- 1-bernoulli_rng(inv_logit(
 g0 +
-g[1]*sqrt(BL_cumwlm_full[n]) +
-//g[2]*BL_cumyrsexp_fullcen[n] +
-g[3]*cuml2lagcen[n] +
-g[4]*cuml2lagcen[n]*cuml2lagcen[n] +
-g[5]*cumx2lagcen[n] +
-g[6]*cumx2lagcen[n]*cumx2lagcen[n] +
-g[7]*age_fullcen[n] +
-g[8]*age_fullcen[n]*age_fullcen[n] +
-g[9]*date_fullcen[n] +
-g[10]*date_fullcen[n]*date_fullcen[n]
+g[1] * BL_cumwlm_fullcen[n] +
+g[2] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+g[3] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+g[4] * BL_cumyrsexp_fullcen[n] +
+g[5] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+g[6] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+g[7] * cuml2lagcen[n] +
+g[8] * cuml2lagcen[n]*cuml2lagcen[n] +
+g[9] * cuml2lagcen[n]*cuml2lagcen[n]*cuml2lagcen[n] +
+g[10] * cumx2lagcen[n] +
+g[11] * cumx2lagcen[n]*cumx2lagcen[n] +
+g[12] * cumx2lagcen[n]*cumx2lagcen[n]*cumx2lagcen[n] +
+g[13] * age_fullcen[n] +
+g[14] * age_fullcen[n]*age_fullcen[n] +
+g[15] * date_fullcen[n] +
+g[16] * date_fullcen[n]*date_fullcen[n] 
             ));
         }
         else lhat[n] <- 0;// no returning work
@@ -411,18 +432,22 @@ g[10]*date_fullcen[n]*date_fullcen[n]
                 rep <- rep+1;
                 xhat[n] <- 1000*exp(normal_rng(
 a0 +
-a[1]*sqrt(BL_cumwlm_full[n]) +
-//a[2]*BL_cumyrsexp_fullcen[n] +
-a[3]*cuml2lagcen[n] +
-a[4]*cuml2lagcen[n]*cuml2lagcen[n] +
-a[5]*cuml2lagcen[n]*cuml2lagcen[n]*cuml2lagcen[n] +
-a[6]*cumx2lagcen[n] + 
-a[7]*cumx2lagcen[n]*cumx2lagcen[n] + 
-a[8]*cumx2lagcen[n]*cumx2lagcen[n]*cumx2lagcen[n] + 
-a[9]*age_fullcen[n] +
-a[10]*age_fullcen[n]*age_fullcen[n] +
-a[11]*date_fullcen[n] +
-a[12]*date_fullcen[n]*date_fullcen[n]
+a[1] * BL_cumwlm_fullcen[n] +
+a[2] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+a[3] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+a[4] * BL_cumyrsexp_fullcen[n] +
+a[5] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+a[6] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+a[7] * cuml2lagcen[n] +
+a[8] * cuml2lagcen[n]*cuml2lagcen[n] +
+a[9] * cuml2lagcen[n]*cuml2lagcen[n]*cuml2lagcen[n] +
+a[10] * cumx2lagcen[n] + 
+a[11] * cumx2lagcen[n]*cumx2lagcen[n] + 
+a[12] * cumx2lagcen[n]*cumx2lagcen[n]*cumx2lagcen[n] + 
+a[13] * age_fullcen[n] +
+a[14] * age_fullcen[n]*age_fullcen[n] +
+a[15] * date_fullcen[n] +
+a[16] * date_fullcen[n]*date_fullcen[n]
                  , sigma2
                 )) ;
             if(rep>10) {
@@ -459,38 +484,44 @@ a[12]*date_fullcen[n]*date_fullcen[n]
 
         h_lcn[n] <- inv_logit(
 b0 +
-b[1]*sqrt(BL_cumwlm_full[n])+
-//b[2]*BL_cumyrsexp_fullcen[n] +
-b[3]*cumlcen[n] + //ends up with a large contribution
-b[4]*cumlcen[n]*cumlcen[n] +
-b[5]*lhat2lag[n] +
-b[6]*sqrt(cumx2lag[n]) +
-b[7]*age_fullcen[n] +
-b[8]*age_fullcen[n]*age_fullcen[n] +
-b[9]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
-b[10]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
-b[12]*date_fullcen[n] +
-b[13]*date_fullcen[n]*date_fullcen[n] +
-b[14]*date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
+b[1] * BL_cumwlm_fullcen[n] +
+b[2] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+b[3] * BL_cumyrsexp_fullcen[n] +
+b[4] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+b[5] * cumlcen[n] + //ends up with a large contribution
+b[6] * cumlcen[n]*cumlcen[n] +
+b[7] * lhat2lag[n] +
+b[8] * cumx2lagcen[n] +
+b[9] * cumx2lagcen[n] * cumx2lagcen[n] +
+b[10] * age_fullcen[n] +
+b[11] * age_fullcen[n]*age_fullcen[n] +
+b[12] * age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+b[13] * age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+b[14] * date_fullcen[n] +
+b[15] * date_fullcen[n]*date_fullcen[n] +
+b[16] * date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
        );
         ////////
         //all other cause mortality
         ////////
         h_nlcn[n] <- inv_logit(
 c0 +
-c[1]*sqrt(BL_cumwlm_full[n]) +
-//c[2]*BL_cumyrsexp_fullcen[n] +
-c[3]*cumlcen[n] +
-c[4]*cumlcen[n]*cumlcen[n] +
-c[5]*lhat2lag[n] +
-c[6]*sqrt(cumx2lag[n]) +
-c[7]*age_fullcen[n] +
-c[8]*age_fullcen[n]*age_fullcen[n] +
-c[9]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
-c[10]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
-c[12]*date_fullcen[n] +
-c[13]*date_fullcen[n]*date_fullcen[n] +
-c[14]*date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
+c[1] * BL_cumwlm_fullcen[n] +
+c[2] * BL_cumwlm_fullcen[n]*BL_cumwlm_fullcen[n] +
+c[3] * BL_cumyrsexp_fullcen[n] +
+c[4] * BL_cumyrsexp_fullcen[n]*BL_cumyrsexp_fullcen[n] +
+c[5] * cumlcen[n] +
+c[6] * cumlcen[n]*cumlcen[n] +
+c[7] * lhat2lag[n] +
+c[8] * cumx2lagcen[n] +
+c[9] * cumx2lagcen[n] +
+c[10] * age_fullcen[n] +
+c[11] * age_fullcen[n]*age_fullcen[n] +
+c[12] * age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+c[13] * age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+c[14] * date_fullcen[n] +
+c[15] * date_fullcen[n]*date_fullcen[n] +
+c[16] * date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
         );
     
     
