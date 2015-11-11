@@ -21,7 +21,7 @@ library(lubridate)
 an <- read_sas("~/EpiProjects/CPUM/data/an0001.sas7bdat")
 
 #variables to keep
-keep <- c("id", "dob", "eligdate", "datein", "dateout", "eligage", "agein", "ageout", "cumwlm", "cumwlm2lag", "cumwlm5lag", "cumwlm10lag",
+keep <- c("id", "dob", "eligdate", "datein", "dateout", "eligage", "agein", "ageout", "wlm", "cumwlm", "cumwlm2lag", "cumwlm5lag", "cumwlm10lag",
           "cumwlm20lag", "d_any", "d_lc", "d_nonlc", "cohort", "priorwlm", "race", "smoke3_1", "smoke3_2", "py", 
           "atwork", "cumyrsexp", "atwork2lag", "atwork5lag", "leftwork", "BL_cumwlm", "BL_cumyrsexp")
 #restrict to nonwhites
@@ -34,6 +34,16 @@ dim(dat <- an[an$race==2 & !is.na(an$smoke3_2), keep])
 #quick stats for comparison with natural course, before and after changing data
 mean(tapply(dat$cumwlm, dat$id, max)) # [1] 416.8733 [1] 467.9895
 mean(tapply(dat$atwork, dat$id, sum)) # [1] 6.197381 [1] 7.002601
+
+#full data
+mean(tapply(datf$cumwlm, datf$id, max)) # [1] 416.9027
+mean(tapply(datf$atwork, datf$id, sum)) # [1] 6.064743
+
+
+
+mnx <- (tapply(datf$wlm, round(datf$ageout), mean))
+
+plot(names(mnx), mnx)
 
 sf <- survfit(Surv(agein, ageout, d_any)~1, data=dat)
 sflc <- survfit(Surv(agein, ageout, d_lc)~1, data=dat)

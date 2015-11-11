@@ -39,7 +39,7 @@ dat$wlm_2_10 = pmax(0, dat$cumwlm2lag-dat$cumwlm10lag)
 
 keep2 <- c("id","minage", "maxage", "agein", "ageout", "dateout", "wlm", "cumwlm", "wlm_2_10", "cumwlm2lag",
           "d_nonlc", "d_lc", "cohort_1", "smoke3_2", 
-          "atwork", "atwork2lag", "cumyrsexp", "leftwork",
+          "atwork", "atwork2lag", "cumyrsexp", "cumyrsexp2lag", "leftwork",
           "BL_cumwlm", "BL_cumyrsexp", "priorwlm")
 
 standat <- as.list(dat[, keep2]) #ok
@@ -57,8 +57,8 @@ length(maxagei <- tapply(dat$maxage, dat$id, min))#of ids
 length(minyeari <- tapply(dat$year, dat$id, min))#of ids
 length(standat$id_full <- rep(1:standat$N, maxagei-minagei+1)) #time at entry up to end of follow-up
 idxyrs <- unlist(tapply(standat$id_full, standat$id_full, function(x) 0:(length(x)-1))) #list of 1:potential censoring date
-length(standat$time_full <- idxyrs + rep(minagei, maxagei-minagei+1)) #time at entry up to end of follow-up
-length(standat$year_full <- idxyrs + rep(minyeari, maxagei-minagei+1)) #time at entry up to end of follow-up
+length(standat$age_full <- idxyrs + rep(minagei, maxagei-minagei+1)) #time at entry up to end of follow-up
+length(standat$date_full <- idxyrs + rep(minyeari, maxagei-minagei+1)) #time at entry up to end of follow-up
 
 length(standat$cohort_full <- rep(tapply(dat$cohort, dat$id, min), maxagei-minagei+1)) 
 length(standat$cohort_1_full <- rep(tapply(dat$cohort_1, dat$id, min), maxagei-minagei+1)) 
@@ -70,10 +70,26 @@ length(standat$BL_cumwlm_full <- rep(tapply(dat$BL_cumwlm, dat$id, min), maxagei
 length(standat$BL_cumyrsexp_full <- rep(tapply(dat$BL_cumyrsexp, dat$id, min), maxagei-minagei+1))
 length(standat$priorwlm_full <- rep(tapply(dat$priorwlm, dat$id, min), maxagei-minagei+1))
 
-(standat$obs <- length(standat$time_full)) #inference time
+(standat$obs <- length(standat$age_full)) #inference time
 
+rowMax <- max(sapply(standat, length)) 
+flatstandat <- do.call(cbind, lapply(standat, function(x){ 
+     length(x) <- rowMax 
+     x 
+ })) 
+#
   attach(standat)
-#  stan_rdump(as.list(names(standat)), "~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_datafull.stan")
+  if(rowMax==196312){
+    print("full data")
+    stan_rdump(as.list(names(standat)), "~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_datafull.standata")
+    write.csv(flatstandat, "~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_datafull.csv")
+    }
+    if(rowMax==37610){
+    print("N.A. data")
+    stan_rdump(as.list(names(standat)), "~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_data.standata")
+    write.csv(flatstandat, "~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_data.csv")
+    }
+    if(rowMax!=37610 & rowMax!=196312) print("something is wrong")
   detach(standat)
 
 #inits for err model
@@ -100,14 +116,14 @@ tail(sort(dat$ageout-dat$agein))
 #checking that frequentist models will run (everyone)
 summary(glm(leftwork ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$atwork==1 | dat$leftwork==1,], family=binomial))
 summary(glm(log(wlm/100) ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$atwork==1 & dat$wlm>0,], family=gaussian))
-summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat, family=binomial))
-summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat, family=binomial))
+summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[!is.na(dat$smoke3_2)], family=binomial))
+summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[!is.na(dat$smoke3_2)], family=binomial))
 
 #checking that frequentist models will run (NA)
-summary(glm(leftwork ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[(dat$atwork==1 | dat$leftwork==1) & dat$race==2,], family=binomial))
-summary(glm(log(wlm/100) ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$atwork==1 & dat$wlm>0 & dat$race==2,], family=gaussian))
-summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2,], family=binomial))
-summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2,], family=binomial))
+summary(glm(leftwork ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + cumwlm2lag + I(cumwlm2lag^2) + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[(dat$atwork==1 | dat$leftwork==1) & dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
+summary(glm(log(wlm/1000) ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + I(cumyrsexp^2) + I(cumyrsexp^3) + cumwlm2lag + I(cumwlm2lag^2) + I(cumwlm2lag^3) + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$atwork==1 & dat$wlm>0 & dat$race==2 & !is.na(dat$smoke3_2),], family=gaussian))
+summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
+summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
 
 
 

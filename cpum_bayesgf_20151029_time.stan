@@ -22,6 +22,7 @@ data {
     row_vector[obscomplete] BL_cumwlm;    // cumulative radon exposure accrued before follow-up started
     row_vector[obscomplete] BL_cumyrsexp; // cumulative employed time accrued before follow-up started
     row_vector[obscomplete] cumyrsexp;    // cumulative employed time accrued after follow-up started
+    row_vector[obscomplete] cumyrsexp2lag;    // cumulative employed time accrued after follow-up started lagged 2 years
     
     
     //outcomes, l variables
@@ -34,8 +35,8 @@ data {
     // see 'generated quantities' section for more details
     row_vector[obs] id_full;
     row_vector[obs] cohort_1_full;
-    row_vector[obs] time_full;
-    row_vector[obs] year_full;
+    row_vector[obs] age_full;
+    row_vector[obs] date_full;
     row_vector[obs] smoke3_2_full;
     row_vector[obs] minage_full;
     row_vector[obs] maxage_full;
@@ -51,11 +52,14 @@ transformed data{
     row_vector[obscomplete] BL_cumwlmcen;
     row_vector[obscomplete] BL_cumyrsexpcen;
     row_vector[obscomplete] cumyrsexpcen;
+    row_vector[obscomplete] cumyrsexp2lagcen;
     row_vector[obscomplete] cumwlm2lagcen;
+    row_vector[obscomplete] sqrt_cumwlm2lag;
+    row_vector[obscomplete] sqrt_BL_cumwlm;
     
 
-    row_vector[obs] time_fullcen;
-    row_vector[obs] year_fullcen;
+    row_vector[obs] age_fullcen;
+    row_vector[obs] date_fullcen;
     row_vector[obs] BL_cumwlm_fullcen;
     row_vector[obs] BL_cumyrsexp_fullcen;
 
@@ -67,10 +71,12 @@ transformed data{
     real meanBL_cumwlm;
     real meanBL_cumyrsexp;
     real meancumyrsexp;  
+    real meancumyrsexp2lag;  
     real meancumwlm2lag;
     real sdBL_cumwlm;
     real sdBL_cumyrsexp;
     real sdcumyrsexp;  
+    real sdcumyrsexp2lag;  
     real sdcumwlm2lag;
     
     
@@ -81,12 +87,14 @@ transformed data{
     meanBL_cumwlm <- mean(BL_cumwlm);
     meanBL_cumyrsexp <- mean(BL_cumyrsexp);
     meancumyrsexp <- mean(cumyrsexp);
+    meancumyrsexp2lag <- mean(cumyrsexp2lag);
     meancumwlm2lag <- mean(cumwlm2lag);
     sdageout <- sd(ageout);
     sddateout <- sd(dateout);
     sdBL_cumwlm <- sd(BL_cumwlm);
     sdBL_cumyrsexp <- sd(BL_cumyrsexp);
     sdcumyrsexp <- sd(cumyrsexp);
+    sdcumyrsexp2lag <- sd(cumyrsexp2lag);
     sdcumwlm2lag <- sd(cumwlm2lag);
     
 
@@ -97,18 +105,21 @@ transformed data{
     //centering an standardizing these variables makes a HUGE difference in the optimization speed
     for(n in 1:obscomplete){
         cumyrsexpcen[n] <- (cumyrsexp[n] - meancumyrsexp) /sdcumyrsexp;
+        cumyrsexp2lagcen[n] <- (cumyrsexp2lag[n] - meancumyrsexp2lag) /sdcumyrsexp2lag;
         cumwlm2lagcen[n] <- (cumwlm2lag[n] - meancumwlm2lag)/sdcumwlm2lag;
 
         ageoutcen[n] <- (ageout[n] - meanageout) /sdageout;
         dateoutcen[n] <- (dateout[n] - meandateout) /sddateout;
         BL_cumwlmcen[n] <- (BL_cumwlm[n] - meanBL_cumwlm) /sdBL_cumwlm;
         BL_cumyrsexpcen[n] <- (BL_cumyrsexp[n] - meanBL_cumyrsexp) /sdBL_cumyrsexp;
-
+        
+        sqrt_cumwlm2lag[n] <- sqrt(cumwlm2lag[n]);
+        sqrt_BL_cumwlm[n] <- sqrt(BL_cumwlm[n]);
     }
     
     for(c in 1:obs){
-        time_fullcen[c] <- (time_full[c]-meanageout)/sdageout;
-        year_fullcen[c] <- (year_full[c]-meandateout)/sddateout;
+        age_fullcen[c] <- (age_full[c]-meanageout)/sdageout;
+        date_fullcen[c] <- (date_full[c]-meandateout)/sddateout;
         BL_cumwlm_fullcen[c]    <- (BL_cumwlm_full[c] - meanBL_cumwlm)/sdBL_cumwlm;
         BL_cumyrsexp_fullcen[c] <- (BL_cumyrsexp_full[c] - meanBL_cumyrsexp)/sdBL_cumyrsexp;
     }
@@ -123,8 +134,8 @@ parameters{
     real c0;
     real g0;
     real<lower=0> sigma2;
-    real a[9];  // exposure
-    real g[9];  // employment
+    real a[12];  // exposure
+    real g[10];  // employment
     real b[14]; // lung cancer
     real c[14]; // all other causes
 }
@@ -135,10 +146,10 @@ model{
 //      b0 ~ normal(0, 100); // uniform prior if commented out
 //      c0 ~ normal(0, 100); // uniform prior if commented out
 //      g0 ~ normal(0, 100); // uniform prior if commented out
-    a ~ normal(0, 11);
-    b ~ normal(0, 11);
-    c ~ normal(0, 11);
-    g ~ normal(0, 11);
+    a ~ normal(0, 5);
+    b ~ normal(0, 5);
+    c ~ normal(0, 5);
+    g ~ normal(0, 5);
     sigma2 ~ inv_gamma(0.1, 0.1); //scale parameter is switched in stan vs. sas (stan scale parameter = iscale parameter in sas)
     for (n in 1:obscomplete){
 
@@ -149,15 +160,16 @@ model{
         if((atwork[n]==1 || leftwork[n]==1) && dateout[n] < 1977.5){
         leftwork[n] ~ bernoulli_logit(
 g0 +
-g[1]*BL_cumwlmcen[n] +
-g[2]*BL_cumyrsexpcen[n] +
-g[3]*cohort_1[n] +
-//g[4]*cumyrsexpcen[n] +
+g[1]*sqrt(BL_cumwlm[n]) +
+//g[2]*BL_cumyrsexpcen[n] +
+g[3]*cumyrsexp2lagcen[n] +
+g[4]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
 g[5]*cumwlm2lagcen[n] +
-g[6]*ageoutcen[n] +
-g[7]*ageoutcen[n]*ageoutcen[n]  +
-g[8]*dateoutcen[n] +
-g[9]*dateoutcen[n]*dateoutcen[n]
+g[6]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+g[7]*ageoutcen[n] +
+g[8]*ageoutcen[n]*ageoutcen[n]  +
+g[9]*dateoutcen[n] +
+g[10]*dateoutcen[n]*dateoutcen[n]
        );
         } else increment_log_prob(0);
 
@@ -167,15 +179,18 @@ g[9]*dateoutcen[n]*dateoutcen[n]
         if(atwork[n]==1 && wlm[n]>0){
         log(wlm[n]/1000) ~ normal(
 a0 +
-a[1]*BL_cumwlmcen[n] +
-a[2]*BL_cumyrsexpcen[n] +
-a[3]*cohort_1[n] +
-a[4]*cumyrsexpcen[n] +
-a[5]*cumwlm2lagcen[n] +
-a[6]*ageoutcen[n] +
-a[7]*ageoutcen[n]*ageoutcen[n] +
-a[8]*dateoutcen[n] +
-a[9]*dateoutcen[n]*dateoutcen[n]
+a[1]*sqrt(BL_cumwlm[n]) +
+//a[2]*BL_cumyrsexpcen[n] +
+a[3]*cumyrsexp2lagcen[n] +
+a[4]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+a[5]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n]*cumyrsexp2lagcen[n] +
+a[6]*cumwlm2lagcen[n] +
+a[7]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+a[8]*cumwlm2lagcen[n]*cumwlm2lagcen[n]*cumwlm2lagcen[n] +
+a[9]*ageoutcen[n] +
+a[10]*ageoutcen[n]*ageoutcen[n] +
+a[11]*dateoutcen[n] +
+a[12]*dateoutcen[n]*dateoutcen[n]
             , sigma2
             );
         } else increment_log_prob(0);
@@ -189,17 +204,16 @@ a[9]*dateoutcen[n]*dateoutcen[n]
         ////////
         d_lc ~ bernoulli_logit(
 b0 +
-b[1]*BL_cumwlmcen +
-b[2]*BL_cumyrsexpcen +
-b[3]*cohort_1 +
-b[4]*cumyrsexpcen +
+b[1]*sqrt_BL_cumwlm +
+//b[2]*BL_cumyrsexpcen +
+b[3]*cumyrsexpcen +
+b[4]* cumyrsexpcen .* cumyrsexpcen +
 b[5]*atwork2lag +
-b[6]*cumwlm2lagcen +
+b[6]*sqrt_cumwlm2lag +
 b[7]*ageoutcen +
 b[8]*ageoutcen .* ageoutcen +
 b[9]*ageoutcen .* ageoutcen .* ageoutcen +
 b[10]*ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
-b[11]* cumyrsexpcen .* cumyrsexpcen .* cumyrsexpcen +
 b[12]*dateoutcen +
 b[13]*dateoutcen .* dateoutcen +
 b[14]*dateoutcen .* dateoutcen .* dateoutcen
@@ -209,17 +223,16 @@ b[14]*dateoutcen .* dateoutcen .* dateoutcen
         ////////
         d_nonlc ~ bernoulli_logit(
 c0 +
-c[1]*BL_cumwlmcen +
-c[2]*BL_cumyrsexpcen +
-c[3]*cohort_1 +
-c[4]*cumyrsexpcen +
+c[1]*sqrt_BL_cumwlm +
+//c[2]*BL_cumyrsexpcen +
+c[3]*cumyrsexpcen +
+c[4]* cumyrsexpcen .* cumyrsexpcen +
 c[5]*atwork2lag +
-c[6]*cumwlm2lagcen +
+c[6]*sqrt_cumwlm2lag +
 c[7]*ageoutcen +
 c[8]*ageoutcen .* ageoutcen +
 c[9]*ageoutcen .* ageoutcen .* ageoutcen  +
 c[10]*ageoutcen .* ageoutcen .* ageoutcen .* ageoutcen +
-c[11]* cumyrsexpcen .* cumyrsexpcen +
 c[12]*dateoutcen +
 c[13]*dateoutcen .* dateoutcen +
 c[14]*dateoutcen .* dateoutcen .* dateoutcen
@@ -248,11 +261,12 @@ generated quantities{
     real cinlc_nc[J];
     real cilc_nc[J];
     real meanCumX[4];
+    
     real meanWkyrs[4];
-    real meanX[J];
-    int R[J]; //count of risk set
 
 { // local scope
+    int R[J]; //count of risk set
+    real meanX[J]; // mean annual exposure
     real surv_2[J];
     real cilc_2[J];
     real cinlc_2[J];
@@ -266,12 +280,9 @@ generated quantities{
     real y_ac[J];
     real ylc[J];
     real ynlc[J];
-
-    int lswitch;
     
     real xhat[obs]; //exposure
     real lhat[obs]; //employment status
-    real leftworkf[obs]; //employment status
     real h_lcn[obs];
     real h_nlcn[obs];
     //
@@ -280,16 +291,19 @@ generated quantities{
     real cumlcen[obs];
     real cumx2lag[obs];
     real cumx2lagcen[obs];
+    real cuml2lag[obs];
+    real cuml2lagcen[obs];
     real cumx5lag[obs];
     real lhat5lag[obs];
     real lhat2lag[obs];
-    
+    real rep;
+
     
     ///// variables from the original data + full data counterparts: ////
     // cumwlmcen = cumxcen
     // cumwlm2lagcen = cumx2lagcen
-    // ageout = time_full
-    // ageoutcen = time_fullcen
+    // ageout = age_full
+    // ageoutcen = age_fullcen
     // cohort_1 = cohort_1_full
     // cumyrsexpcen = cumlcen
     // BL_cumyrsexp = BL_cumyrsexpfull
@@ -298,16 +312,15 @@ generated quantities{
     // BL_cumwlmcencen = BL_cumwlm_fullcen
     // atwork = lhat
     // wlm = xhat
-    // leftwork = leftworkf
     /////////////////////////////////////////////////////////////////////
     //initilialize lagged, cumulative variables
     
-for(interv in 4:1){    
+for(interv in 1:4){    
     //intervention loop:
-    // 1 = natural course
-    // 2 = 2 wlm/m limit (24/yr)
-    // 3 = 1 wlm/m limit (12/yr)
-    // 4 = 0.33 wlm/m limit (4/yr)
+    // 1 = 2 wlm/m limit (24/yr)
+    // 2 = 1 wlm/m limit (12/yr)
+    // 3 = 0.33 wlm/m limit (4/yr)
+    // 4 = natural course
     meanCumX[interv] <- 0;
     meanWkyrs[interv] <- 0;
     
@@ -315,176 +328,188 @@ for(interv in 4:1){
     for(n in 1:obs){
         cumx[n] <- 0; // cumulative exposure
         cuml[n] <- 0;  // cumulative time at work
-        cumlcen[n] <- -meancumyrsexp/sdcumyrsexp;  // cumulative time at work, the referent level for a centered variable
-        cumx5lag[n] <- 0;
-        cumx2lag[n] <- 0;
-        cumx2lagcen[n] <- -meancumwlm2lag/sdcumwlm2lag; // the referent level for a centered variable
-        lhat5lag[n] <- 0;
-        lhat2lag[n] <- 0;
+        cumlcen[n] <- (cuml[n]-meancumyrsexp)/sdcumyrsexp;  // cumulative time at work, the referent level for a centered variable
         lhat[n] <- 0;
+        xhat[n] <- 0;
     }
     //initialize potential average rates, mean exposure
     for(k in 1:J){
-    	R[k] <- 0;
+        R[k] <- 0;
         ylc[k] <- 0;
         ynlc[k] <- 0;
         meanX[k] <- 0;
     }
    //////////////////////// 
-   // main loop
+   // main loop - looping over person-periods
    //////////////////////// 
    //using likelihood to generate potential expected covariate, outcomes
     for (n in 1:obs){
     
-    // lagged variables
-    if(n>5 && id_full[n]==id_full[n-5]){ //calculate cumulative values if id has at least 5 prior time points
-        cumx5lag[n] <- cumx[n-5];
-        lhat5lag[n] <- lhat[n-5];
-    }
-    if(n>2 && id_full[n]==id_full[n-2]){ //calculate cumulative values if id has at least 2 prior time points
-        lhat2lag[n] <- lhat[n-2];
-        cumx2lag[n] <- cumx[n-2];
-        cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag;
-    }
+        // lagged variables
+        if(n>5 && id_full[n]==id_full[n-5]){ //calculate cumulative values if id has at least 5 prior time points
+            cumx5lag[n] <- cumx[n-5];
+            lhat5lag[n] <- lhat[n-5];
+        }
+        else{
+            cumx5lag[n] <- 0;
+            lhat5lag[n] <- 0;
+        }
+        if(n>2 && id_full[n]==id_full[n-2]){ //calculate cumulative values if id has at least 2 prior time points
+            lhat2lag[n] <- lhat[n-2];
+            cumx2lag[n] <- cumx[n-2];
+            cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag;
+            cuml2lag[n] <- cuml[n-2];
+            cuml2lagcen[n] <- (cuml2lag[n]-meancumyrsexp2lag)/sdcumyrsexp2lag;
+        }
+        else{
+            lhat2lag[n] <- 0;
+            cumx2lag[n] <- 0;
+            cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag; // the referent level for a centered variable
+            cuml2lag[n] <- 0;
+            cuml2lagcen[n] <- (cuml2lag[n]-meancumyrsexp2lag)/sdcumyrsexp2lag;
+        }
 
         ////////
         //employment status
         ////////
-        //work status treated like a binary switch that starts on the 'on' position and can only be
-        // turned off once
-    	if(n==1 || id_full[n] != id_full[n-1]){
-    	  lhat[n] <- 1;
-    	  lswitch <- 1;
-    	}
-    	if(lswitch==1){
-        leftworkf[n] <- bernoulli_rng(inv_logit(
+        // no returning to work once off work
+        if(n==1 || id_full[n] != id_full[n-1]) lhat[n] <- 1; //assume at work if in first time period
+        else if(n>1 && id_full[n] == id_full[n-1] && lhat[n-1] == 1  && date_full[n] < 1978){// can't actually leave first time point, can't be exposed after 1970
+            // work[n] = 1-probability of leaving work
+            lhat[n] <- 1-bernoulli_rng(inv_logit(
 g0 +
-g[1]*BL_cumwlm_fullcen[n] +
-g[2]*BL_cumyrsexp_fullcen[n] +
-g[3]*cohort_1_full[n] +
-//g[4]*cumlcen[n] +
+g[1]*sqrt(BL_cumwlm_full[n]) +
+//g[2]*BL_cumyrsexp_fullcen[n] +
+g[3]*cuml2lagcen[n] +
+g[4]*cuml2lagcen[n]*cuml2lagcen[n] +
 g[5]*cumx2lagcen[n] +
-g[6]*time_fullcen[n] +
-g[7]*time_fullcen[n]*time_fullcen[n] +
-g[8]*year_fullcen[n] +
-g[9]*year_fullcen[n]*year_fullcen[n]
-        ));
-        if(n==1 || id_full[n] != id_full[n-1] || year_fullcen[n]>1977.5) leftworkf[n] <- 0; // can't actually leave first time point, can't be exposed after 1970
-        if(leftworkf[n]==1){
-        	lhat[n] <- 0;
-        	lswitch <- 0;
+g[6]*cumx2lagcen[n]*cumx2lagcen[n] +
+g[7]*age_fullcen[n] +
+g[8]*age_fullcen[n]*age_fullcen[n] +
+g[9]*date_fullcen[n] +
+g[10]*date_fullcen[n]*date_fullcen[n]
+            ));
         }
-        else lhat[n] <- 1;
-        } //lswitch=1
-         else { // if lswitch=0 (not at work)
-            leftworkf[n] <- 0;
-            lhat[n] <- 0;
+        else lhat[n] <- 0;// no returning work
+    
+        //cumulative employment variables
+        if(n==1 || id_full[n] != id_full[n-1]){ //first observation for each individual
+            cuml[n] <- lhat[n];
+            cumlcen[n] <- (cuml[n]-meancumyrsexp)/sdcumyrsexp;
         }
-    //cumulative variables
-    if(n==1 || id_full[n]!=id_full[n-1]){ //first observation for each individual
-        cuml[n] <- lhat[n];
-        cumlcen[n] <- (cuml[n]-meancumyrsexp)/sdcumyrsexp;
-    }
-    if(n>1 && id_full[n]==id_full[n-1]){ //calculate cumulative values if not first observation
-        cuml[n] <- cuml[n-1] + lhat[n];
-        cumlcen[n] <- (cuml[n]-meancumyrsexp)/sdcumyrsexp;
-    }
+        else if(n>1 && id_full[n]==id_full[n-1]){ //calculate cumulative values if not first observation
+            cuml[n] <- cuml[n-1] + lhat[n];
+            cumlcen[n] <- (cuml[n]-meancumyrsexp)/sdcumyrsexp;
+        }
         ////////
         //exposure
         ////////
         if(lhat[n]==1){
-            xhat[n] <- 1000*exp(normal_rng(
+            xhat[n] <- 4500;
+            rep <- 0;
+            while(xhat[n]>4000){
+                rep <- rep+1;
+                xhat[n] <- 1000*exp(normal_rng(
 a0 +
-a[1]*BL_cumwlm_fullcen[n] +
-a[2]*BL_cumyrsexp_fullcen[n] +
-a[3]*cohort_1_full[n] +
-a[4]*cumlcen[n] +
-a[5]*cumx2lagcen[n] +
-a[6]*time_fullcen[n] +
-a[7]*time_fullcen[n]*time_fullcen[n] +
-a[8]*year_fullcen[n] +
-a[9]*year_fullcen[n]*year_fullcen[n]
-         , sigma2
-        ));
+a[1]*sqrt(BL_cumwlm_full[n]) +
+//a[2]*BL_cumyrsexp_fullcen[n] +
+a[3]*cuml2lagcen[n] +
+a[4]*cuml2lagcen[n]*cuml2lagcen[n] +
+a[5]*cuml2lagcen[n]*cuml2lagcen[n]*cuml2lagcen[n] +
+a[6]*cumx2lagcen[n] + 
+a[7]*cumx2lagcen[n]*cumx2lagcen[n] + 
+a[8]*cumx2lagcen[n]*cumx2lagcen[n]*cumx2lagcen[n] + 
+a[9]*age_fullcen[n] +
+a[10]*age_fullcen[n]*age_fullcen[n] +
+a[11]*date_fullcen[n] +
+a[12]*date_fullcen[n]*date_fullcen[n]
+                 , sigma2
+                )) ;
+            if(rep>10) {
+                //escape if it just gets beyond bad
+            	print("exposure model wacky");
+            	xhat[n] <- 4000;
+            }
+
+            } //while loop for truncating exposures
         }
         else if(lhat[n]==0) xhat[n] <- 0;
         
-        if(interv==2 && xhat[n]>24){
+        // intervention levels for exposures
+        if(interv==1 && xhat[n]>24){
             xhat[n] <- 24;
         }
-        if(interv==3 && xhat[n]>12){
+        if(interv==2 && xhat[n]>12){
             xhat[n] <- 12;
         }
-        if(interv==4 && xhat[n]>4){
+        if(interv==3 && xhat[n]>4){
             xhat[n] <- 4;        
         }
     
-    //cumulative variables
-    if(n==1 || id_full[n]!=id_full[n-1]){ //first observation for each individual
-        cumx[n] <- xhat[n];
-    }
-    if(n>1 && id_full[n]==id_full[n-1]){ //calculate cumulative values if not first observation
-        cumx[n] <- cumx[n-1] + xhat[n];
-    }
-    ////////
-    //lung cancer mortality
-    ////////
+        //cumulative exposure variables
+        if(n==1 || id_full[n]!=id_full[n-1]){ //first observation for each individual
+            cumx[n] <- xhat[n];
+        }
+        if(n>1 && id_full[n]==id_full[n-1]){ //calculate cumulative values if not first observation
+            cumx[n] <- cumx[n-1] + xhat[n];
+        }
+        ////////
+        //lung cancer mortality
+        ////////
 
-    h_lcn[n] <- inv_logit(
+        h_lcn[n] <- inv_logit(
 b0 +
-b[1]*BL_cumwlm_fullcen[n] +
-b[2]*BL_cumyrsexp_fullcen[n] +
-b[3]*cohort_1_full[n] +
-b[4]*cumlcen[n] + //ends up with a large contribution
+b[1]*sqrt(BL_cumwlm_full[n])+
+//b[2]*BL_cumyrsexp_fullcen[n] +
+b[3]*cumlcen[n] + //ends up with a large contribution
+b[4]*cumlcen[n]*cumlcen[n] +
 b[5]*lhat2lag[n] +
-b[6]*cumx2lagcen[n] +
-b[7]*time_fullcen[n] +
-b[8]*time_fullcen[n]*time_fullcen[n] +
-b[9]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] +
-b[10]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] +
-b[11]*cumlcen[n]*cumlcen[n]*cumlcen[n] +
-b[12]*year_fullcen[n] +
-b[13]*year_fullcen[n]*year_fullcen[n] +
-b[14]*year_fullcen[n]*year_fullcen[n]*year_fullcen[n]
-   );
-    ////////
-    //all other cause mortality
-    ////////
-    h_nlcn[n] <- inv_logit(
+b[6]*sqrt(cumx2lag[n]) +
+b[7]*age_fullcen[n] +
+b[8]*age_fullcen[n]*age_fullcen[n] +
+b[9]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+b[10]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+b[12]*date_fullcen[n] +
+b[13]*date_fullcen[n]*date_fullcen[n] +
+b[14]*date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
+       );
+        ////////
+        //all other cause mortality
+        ////////
+        h_nlcn[n] <- inv_logit(
 c0 +
-c[1]*BL_cumwlm_fullcen[n] +
-c[2]*BL_cumyrsexp_fullcen[n] +
-c[3]*cohort_1_full[n] +
-c[4]*cumlcen[n] +
+c[1]*sqrt(BL_cumwlm_full[n]) +
+//c[2]*BL_cumyrsexp_fullcen[n] +
+c[3]*cumlcen[n] +
+c[4]*cumlcen[n]*cumlcen[n] +
 c[5]*lhat2lag[n] +
-c[6]*cumx2lagcen[n] +
-c[7]*time_fullcen[n] +
-c[8]*time_fullcen[n]*time_fullcen[n] +
-c[9]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] +
-c[10]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n]*time_fullcen[n] +
-c[11]*cumlcen[n]*cumlcen[n] +
-c[12]*year_fullcen[n] +
-c[13]*year_fullcen[n]*year_fullcen[n] +
-c[14]*year_fullcen[n]*year_fullcen[n]*year_fullcen[n]
-    );
+c[6]*sqrt(cumx2lag[n]) +
+c[7]*age_fullcen[n] +
+c[8]*age_fullcen[n]*age_fullcen[n] +
+c[9]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+c[10]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
+c[12]*date_fullcen[n] +
+c[13]*date_fullcen[n]*date_fullcen[n] +
+c[14]*date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
+        );
     
     
-    for (k in 1:J){
-    //loop over time of interest for inference (will essentially drop observations if they occur outside of this window)
-        if(time_full[n]==(k+minT-1)){
-            //risk set size
-            R[k] <- R[k] + 1;
-            //these will be averaged below
-            ylc[k] <- ylc[k] + h_lcn[n];
-            ynlc[k] <- ynlc[k] + h_nlcn[n];
-            meanX[k] <- meanX[k] + xhat[n];
-    	} //time_full
-    } // k in 1:J
-    if(time_full[n]==maxT || time_full[n]==maxage_full[n]) {
-     	meanCumX[interv] <- meanCumX[interv] + cumx[n]/N;
-     	meanWkyrs[interv] <- meanWkyrs[interv] + cuml[n]/N;
-     }
-    } // n in 1:obs
+        for (k in 1:J){
+        //loop over time of interest for inference (will essentially drop observations if they occur outside of this window)
+            if(age_full[n]==(k+minT-1)){
+                //risk set size
+                R[k] <- R[k] + 1;
+                //these will be averaged below
+                ylc[k] <- ylc[k] + h_lcn[n];
+                ynlc[k] <- ynlc[k] + h_nlcn[n];
+                meanX[k] <- meanX[k] + xhat[n];
+            } //age_full
+        } // k in 1:J
+        if(age_full[n]==maxT || age_full[n]==maxage_full[n]) {
+            meanCumX[interv] <- meanCumX[interv] + cumx[n]/N;
+            meanWkyrs[interv] <- meanWkyrs[interv] + cuml[n]/N;
+         }
+    } // n in 1:obs (end main loop)
 
     for (k in 1:J){
         //take average over risk set (average rate)
@@ -496,52 +521,54 @@ c[14]*year_fullcen[n]*year_fullcen[n]*year_fullcen[n]
 
     
     //interventions
+    
     if(interv==1){    
-		// calculate survival, survival difference, risk difference under interventions
-		surv_nc[1]    <- 1 - (ylc[1] + ynlc[1]);
-		cilc_nc[1]  <- ylc[1];
-		cinlc_nc[1] <-  ynlc[1];
-		for (k in 2:J){
-			surv_nc[k]  <-                   (1-(ylc[k] + ynlc[k]))*(surv_nc[k-1]);
-			cilc_nc[k]  <-   cilc_nc[k-1]  + (   ylc[k]           )*(surv_nc[k-1]); 
-			cinlc_nc[k] <-   cinlc_nc[k-1] + (            ynlc[k] )*(surv_nc[k-1]); 
-		}
+        // calculate survival, survival difference, risk difference under interventions
+        surv_2[1]    <- 1 - (ylc[1] + ynlc[1]);
+        cilc_2[1]  <- ylc[1];
+        cinlc_2[1] <-  ynlc[1];
+        for (k in 2:J){
+            surv_2[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_2[k-1]);
+            cilc_2[k]  <-   cilc_2[k-1]  + (   ylc[k]           )*(surv_2[k-1]); 
+            cinlc_2[k] <-   cinlc_2[k-1] + (            ynlc[k] )*(surv_2[k-1]); 
+        }
     }// interv 1
     
     if(interv==2){    
-		// calculate survival, survival difference, risk difference under interventions
-		surv_2[1]    <- 1 - (ylc[1] + ynlc[1]);
-		cilc_2[1]  <- ylc[1];
-		cinlc_2[1] <-  ynlc[1];
-		for (k in 2:J){
-			surv_2[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_2[k-1]);
-			cilc_2[k]  <-   cilc_2[k-1]  + (   ylc[k]           )*(surv_2[k-1]); 
-			cinlc_2[k] <-   cinlc_2[k-1] + (            ynlc[k] )*(surv_2[k-1]); 
-		}
+        // calculate survival, survival difference, risk difference under interventions
+        surv_1[1]    <- 1 - (ylc[1] + ynlc[1]);
+        cilc_1[1]  <- ylc[1];
+        cinlc_1[1] <-  ynlc[1];
+        for (k in 2:J){
+            surv_1[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_1[k-1]);
+            cilc_1[k]  <-   cilc_1[k-1]  + (   ylc[k]           )*(surv_1[k-1]); 
+            cinlc_1[k] <-   cinlc_1[k-1] + (            ynlc[k] )*(surv_1[k-1]); 
+        }
     }// interv 2
-    
     if(interv==3){    
-		// calculate survival, survival difference, risk difference under interventions
-		surv_1[1]    <- 1 - (ylc[1] + ynlc[1]);
-		cilc_1[1]  <- ylc[1];
-		cinlc_1[1] <-  ynlc[1];
-		for (k in 2:J){
-			surv_1[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_1[k-1]);
-			cilc_1[k]  <-   cilc_1[k-1]  + (   ylc[k]           )*(surv_1[k-1]); 
-			cinlc_1[k] <-   cinlc_1[k-1] + (            ynlc[k] )*(surv_1[k-1]); 
-		}
+        // calculate survival, survival difference, risk difference under interventions
+        surv_33[1]    <- 1 - (ylc[1] + ynlc[1]);
+        cilc_33[1]  <- ylc[1];
+        cinlc_33[1] <-  ynlc[1];
+        for (k in 2:J){
+            surv_33[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_33[k-1]);
+            cilc_33[k]  <-   cilc_1[k-1]  + (   ylc[k]           )*(surv_33[k-1]); 
+            cinlc_33[k] <-   cinlc_1[k-1] + (            ynlc[k] )*(surv_33[k-1]); 
+        }
     }// interv 3
-    if(interv==4){    
-		// calculate survival, survival difference, risk difference under interventions
-		surv_33[1]    <- 1 - (ylc[1] + ynlc[1]);
-		cilc_33[1]  <- ylc[1];
-		cinlc_33[1] <-  ynlc[1];
-		for (k in 2:J){
-			surv_33[k]  <-                  (1-(ylc[k] + ynlc[k]))*(surv_33[k-1]);
-			cilc_33[k]  <-   cilc_1[k-1]  + (   ylc[k]           )*(surv_33[k-1]); 
-			cinlc_33[k] <-   cinlc_1[k-1] + (            ynlc[k] )*(surv_33[k-1]); 
-		}
-    }// interv 4
+        if(interv==4){    
+        // calculate survival, survival difference, risk difference under interventions
+        surv_nc[1]    <- 1 - (ylc[1] + ynlc[1]);
+        cilc_nc[1]  <- ylc[1];
+        cinlc_nc[1] <-  ynlc[1];
+        for (k in 2:J){
+            surv_nc[k]  <-                   (1-(ylc[k] + ynlc[k]))*(surv_nc[k-1]);
+            cilc_nc[k]  <-   cilc_nc[k-1]  + (   ylc[k]           )*(surv_nc[k-1]); 
+            cinlc_nc[k] <-   cinlc_nc[k-1] + (            ynlc[k] )*(surv_nc[k-1]); 
+        }
+    }// natural course
+
+    
     }//end intervention
 }// end local scope
 
