@@ -23,6 +23,8 @@ data {
     row_vector[obscomplete] BL_cumyrsexp; // cumulative employed time accrued before follow-up started
     row_vector[obscomplete] cumyrsexp;    // cumulative employed time accrued after follow-up started
     row_vector[obscomplete] cumyrsexp2lag;    // cumulative employed time accrued after follow-up started lagged 2 years
+    row_vector[obscomplete] wlm_2_10;    // cumulative employed time accrued after follow-up started lagged 2 years
+    row_vector[obscomplete] cumwlm10lag;    // cumulative employed time accrued after follow-up started lagged 2 years
     
     
     //outcomes, l variables
@@ -56,6 +58,7 @@ transformed data{
     row_vector[obscomplete] cumwlm2lagcen;
     row_vector[obscomplete] sqrt_cumwlm2lag;
     row_vector[obscomplete] sqrt_BL_cumwlm;
+    row_vector[obscomplete] avgexp2lag;
 
     row_vector[obs] age_fullcen;
     row_vector[obs] date_fullcen;
@@ -114,6 +117,7 @@ transformed data{
         
         sqrt_cumwlm2lag[n] <- sqrt(cumwlm2lag[n]);
         sqrt_BL_cumwlm[n] <- sqrt(BL_cumwlm[n]);
+        avgexp2lag[n] <- if_else(cumyrsexp2lag[n]>0, cumwlm2lag[n]/cumyrsexp2lag[n], 0);
     }
     
     for(c in 1:obs){
@@ -214,13 +218,17 @@ a[17] * dateoutcen[n]*dateoutcen[n]*dateoutcen[n]
         ////////
         d_lc ~ bernoulli_logit(
 b0 +
-b[1] * BL_cumwlmcen +
-b[2] * BL_cumyrsexpcen +
+//b[1] * BL_cumwlmcen +
+//b[2] * BL_cumyrsexpcen +
 b[3] * cumyrsexpcen +
 b[4] * cumyrsexpcen .* cumyrsexpcen +
-b[5] * cumyrsexpcen .* cumwlm2lagcen +
-b[6] * cumwlm2lagcen +
-b[7] * cumwlm2lagcen .* cumwlm2lagcen +
+//b[5] * cumyrsexp2lagcen .* cumwlm2lagcen +
+b[6] * wlm_2_10 +
+b[7] * cumwlm10lag +
+//b[1] * wlm_2_10 .* wlm_2_10 +
+//b[2] * cumwlm10lag .* cumwlm10lag +
+//b[6] * cumwlm2lagcen +
+//b[7] * cumwlm2lagcen .* cumwlm2lagcen +
 b[8] * ageoutcen +
 b[9] * ageoutcen .* ageoutcen +
 b[10] * ageoutcen .* ageoutcen .* ageoutcen +
@@ -307,6 +315,11 @@ generated quantities{
     real cumx5lag[obs];
     real lhat5lag[obs];
     real lhat2lag[obs];
+    real avgexp2lag_full[obs];
+    real xhat_2_10[obs];
+    real cumx10lag[obs];
+    real lhat10lag[obs];
+    real cuml10lag[obs];
     real rep;
 
     
@@ -357,6 +370,16 @@ for(interv in 1:4){
     for (n in 1:obs){
     
         // lagged variables
+        if(n>10 && id_full[n]==id_full[n-10]){ //calculate cumulative values if id has at least 5 prior time points
+            cumx10lag[n] <- cumx[n-10];
+            lhat10lag[n] <- lhat[n-10];
+            xhat_2_10[n] <- if_else(cumx2lag[n]-cumx10lag[n]>0, cumx2lag[n]-cumx10lag[n], 0);
+        }
+        else{
+            cumx10lag[n] <- 0;
+            lhat10lag[n] <- 0;
+            xhat_2_10[n] <- 0;
+        }
         if(n>5 && id_full[n]==id_full[n-5]){ //calculate cumulative values if id has at least 5 prior time points
             cumx5lag[n] <- cumx[n-5];
             lhat5lag[n] <- lhat[n-5];
@@ -371,6 +394,7 @@ for(interv in 1:4){
             cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag;
             cuml2lag[n] <- cuml[n-2];
             cuml2lagcen[n] <- (cuml2lag[n]-meancumyrsexp2lag)/sdcumyrsexp2lag;
+            avgexp2lag_full[n] <- if_else(cuml2lag[n]>0, cumx2lag[n]/cuml2lag[n], 0);
         }
         else{
             lhat2lag[n] <- 0;
@@ -378,6 +402,7 @@ for(interv in 1:4){
             cumx2lagcen[n] <- (cumx2lag[n]-meancumwlm2lag)/sdcumwlm2lag; // the referent level for a centered variable
             cuml2lag[n] <- 0;
             cuml2lagcen[n] <- (cuml2lag[n]-meancumyrsexp2lag)/sdcumyrsexp2lag;
+            avgexp2lag_full[n] <- if_else(cuml2lag[n]>0, cumx2lag[n]/cuml2lag[n], 0);
         }
 
         ////////
@@ -481,18 +506,23 @@ a[17] * date_fullcen[n]*date_fullcen[n]*date_fullcen[n]
 
         h_lcn[n] <- inv_logit(
 b0 +
-b[1] * BL_cumwlm_fullcen[n] +
-b[2] * BL_cumyrsexp_fullcen[n] +
+//b[1] * BL_cumwlm_fullcen[n] +
+//b[2] * BL_cumyrsexp_fullcen[n] +
 b[3] * cumlcen[n] + 
 b[4] * cumlcen[n]*cumlcen[n] +
-b[5] * lhat2lag[n] +
-b[6] * cumx2lagcen[n] +
-b[7] * cumx2lagcen[n] * cumx2lagcen[n] +
+//b[5] * cuml2lagcen[n] * cumx2lagcen[n]+
+b[6] * xhat_2_10[n] +
+b[7] * cumx10lag[n] +
+//b[1] * xhat_2_10[n] * xhat_2_10[n] +
+//b[2] * cumx10lag[n] * cumx10lag[n] +
+//b[6] * cumx2lagcen[n] +
+//b[7] * cumx2lagcen[n] * cumx2lagcen[n] +
 b[8] * age_fullcen[n] +
 b[9] * age_fullcen[n]*age_fullcen[n] +
 b[10] * age_fullcen[n]*age_fullcen[n]*age_fullcen[n] +
 b[11] * date_fullcen[n] +
 b[12] * date_fullcen[n]*date_fullcen[n]
+
        );
         ////////
         //all other cause mortality
