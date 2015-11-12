@@ -840,9 +840,9 @@ throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
                 }
             }
             current_statement_begin__ = 219;
-            lp_accum__.add(bernoulli_logit_log<propto__>(d_lc, add(add(add(add(add(add(add(add(add(b0,multiply(get_base1(b,3,"b",1),cumyrsexpcen)),elt_multiply(multiply(get_base1(b,4,"b",1),cumyrsexpcen),cumyrsexpcen)),multiply(get_base1(b,6,"b",1),wlm_2_10)),multiply(get_base1(b,7,"b",1),cumwlm10lag)),multiply(get_base1(b,8,"b",1),ageoutcen)),elt_multiply(multiply(get_base1(b,9,"b",1),ageoutcen),ageoutcen)),elt_multiply(elt_multiply(multiply(get_base1(b,10,"b",1),ageoutcen),ageoutcen),ageoutcen)),multiply(get_base1(b,11,"b",1),dateoutcen)),elt_multiply(multiply(get_base1(b,12,"b",1),dateoutcen),dateoutcen))));
-            current_statement_begin__ = 241;
-            lp_accum__.add(bernoulli_logit_log<propto__>(d_nonlc, add(add(add(add(add(add(add(c0,multiply(get_base1(c,1,"c",1),BL_cumwlmcen)),multiply(get_base1(c,3,"c",1),BL_cumyrsexpcen)),multiply(get_base1(c,8,"c",1),cumwlm2lagcen)),multiply(get_base1(c,10,"c",1),ageoutcen)),elt_multiply(multiply(get_base1(c,11,"c",1),ageoutcen),ageoutcen)),multiply(get_base1(c,14,"c",1),dateoutcen)),elt_multiply(multiply(get_base1(c,15,"c",1),dateoutcen),dateoutcen))));
+            lp_accum__.add(bernoulli_logit_log<propto__>(d_lc, add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(b0,multiply(get_base1(b,1,"b",1),BL_cumwlmcen)),elt_multiply(multiply(get_base1(b,2,"b",1),BL_cumwlmcen),BL_cumwlmcen)),elt_multiply(elt_multiply(multiply(get_base1(b,3,"b",1),BL_cumwlmcen),BL_cumwlmcen),BL_cumwlmcen)),multiply(get_base1(b,4,"b",1),BL_cumyrsexpcen)),elt_multiply(multiply(get_base1(b,5,"b",1),BL_cumyrsexpcen),BL_cumyrsexpcen)),elt_multiply(elt_multiply(multiply(get_base1(b,6,"b",1),BL_cumyrsexpcen),BL_cumyrsexpcen),BL_cumyrsexpcen)),multiply(get_base1(b,7,"b",1),cumyrsexp2lagcen)),elt_multiply(multiply(get_base1(b,8,"b",1),cumyrsexp2lagcen),cumyrsexp2lagcen)),elt_multiply(elt_multiply(multiply(get_base1(b,9,"b",1),cumyrsexp2lagcen),cumyrsexp2lagcen),cumyrsexp2lagcen)),multiply(get_base1(b,10,"b",1),cumwlm2lagcen)),elt_multiply(multiply(get_base1(b,11,"b",1),cumwlm2lagcen),cumwlm2lagcen)),elt_multiply(elt_multiply(multiply(get_base1(b,12,"b",1),cumwlm2lagcen),cumwlm2lagcen),cumwlm2lagcen)),multiply(get_base1(b,13,"b",1),ageoutcen)),elt_multiply(multiply(get_base1(b,14,"b",1),ageoutcen),ageoutcen)),elt_multiply(elt_multiply(multiply(get_base1(b,15,"b",1),ageoutcen),ageoutcen),ageoutcen)),multiply(get_base1(b,16,"b",1),dateoutcen)),elt_multiply(multiply(get_base1(b,17,"b",1),dateoutcen),dateoutcen))));
+            current_statement_begin__ = 242;
+            lp_accum__.add(bernoulli_logit_log<propto__>(d_nonlc, add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(add(c0,multiply(get_base1(c,1,"c",1),BL_cumwlmcen)),elt_multiply(multiply(get_base1(c,2,"c",1),BL_cumwlmcen),BL_cumwlmcen)),elt_multiply(elt_multiply(multiply(get_base1(c,3,"c",1),BL_cumwlmcen),BL_cumwlmcen),BL_cumwlmcen)),multiply(get_base1(c,4,"c",1),BL_cumyrsexpcen)),elt_multiply(multiply(get_base1(c,5,"c",1),BL_cumyrsexpcen),BL_cumyrsexpcen)),elt_multiply(elt_multiply(multiply(get_base1(c,6,"c",1),BL_cumyrsexpcen),BL_cumyrsexpcen),BL_cumyrsexpcen)),multiply(get_base1(c,7,"c",1),cumyrsexp2lagcen)),elt_multiply(multiply(get_base1(c,8,"c",1),cumyrsexp2lagcen),cumyrsexp2lagcen)),elt_multiply(elt_multiply(multiply(get_base1(c,9,"c",1),cumyrsexp2lagcen),cumyrsexp2lagcen),cumyrsexp2lagcen)),multiply(get_base1(c,10,"c",1),cumwlm2lagcen)),elt_multiply(multiply(get_base1(c,11,"c",1),cumwlm2lagcen),cumwlm2lagcen)),elt_multiply(elt_multiply(multiply(get_base1(c,12,"c",1),cumwlm2lagcen),cumwlm2lagcen),cumwlm2lagcen)),multiply(get_base1(c,13,"c",1),ageoutcen)),elt_multiply(multiply(get_base1(c,14,"c",1),ageoutcen),ageoutcen)),elt_multiply(elt_multiply(multiply(get_base1(c,15,"c",1),ageoutcen),ageoutcen),ageoutcen)),multiply(get_base1(c,16,"c",1),dateoutcen)),elt_multiply(multiply(get_base1(c,17,"c",1),dateoutcen),dateoutcen))));
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e,current_statement_begin__);
             // Next line prevents compiler griping about no return
@@ -1090,276 +1090,276 @@ throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***");
                 stan::math::initialize(lhat10lag, std::numeric_limits<double>::quiet_NaN());
                 stan::math::initialize(cuml10lag, std::numeric_limits<double>::quiet_NaN());
                 stan::math::initialize(rep, std::numeric_limits<double>::quiet_NaN());
-                current_statement_begin__ = 342;
+                current_statement_begin__ = 345;
                 for (int interv = 1; interv <= 4; ++interv) {
-                    current_statement_begin__ = 348;
+                    current_statement_begin__ = 351;
                     stan::math::assign(get_base1_lhs(meanCumX,interv,"meanCumX",1), 0);
-                    current_statement_begin__ = 349;
-                    stan::math::assign(get_base1_lhs(meanWkyrs,interv,"meanWkyrs",1), 0);
                     current_statement_begin__ = 352;
+                    stan::math::assign(get_base1_lhs(meanWkyrs,interv,"meanWkyrs",1), 0);
+                    current_statement_begin__ = 355;
                     for (int n = 1; n <= obs; ++n) {
-                        current_statement_begin__ = 353;
-                        stan::math::assign(get_base1_lhs(cumx,n,"cumx",1), 0);
-                        current_statement_begin__ = 354;
-                        stan::math::assign(get_base1_lhs(cuml,n,"cuml",1), 0);
-                        current_statement_begin__ = 355;
-                        stan::math::assign(get_base1_lhs(cumlcen,n,"cumlcen",1), ((get_base1(cuml,n,"cuml",1) - meancumyrsexp) / sdcumyrsexp));
                         current_statement_begin__ = 356;
-                        stan::math::assign(get_base1_lhs(lhat,n,"lhat",1), 0);
+                        stan::math::assign(get_base1_lhs(cumx,n,"cumx",1), 0);
                         current_statement_begin__ = 357;
+                        stan::math::assign(get_base1_lhs(cuml,n,"cuml",1), 0);
+                        current_statement_begin__ = 358;
+                        stan::math::assign(get_base1_lhs(cumlcen,n,"cumlcen",1), ((get_base1(cuml,n,"cuml",1) - meancumyrsexp) / sdcumyrsexp));
+                        current_statement_begin__ = 359;
+                        stan::math::assign(get_base1_lhs(lhat,n,"lhat",1), 0);
+                        current_statement_begin__ = 360;
                         stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 0);
                     }
-                    current_statement_begin__ = 360;
+                    current_statement_begin__ = 363;
                     for (int k = 1; k <= J; ++k) {
-                        current_statement_begin__ = 361;
-                        stan::math::assign(get_base1_lhs(R,k,"R",1), 0);
-                        current_statement_begin__ = 362;
-                        stan::math::assign(get_base1_lhs(ylc,k,"ylc",1), 0);
-                        current_statement_begin__ = 363;
-                        stan::math::assign(get_base1_lhs(ynlc,k,"ynlc",1), 0);
                         current_statement_begin__ = 364;
+                        stan::math::assign(get_base1_lhs(R,k,"R",1), 0);
+                        current_statement_begin__ = 365;
+                        stan::math::assign(get_base1_lhs(ylc,k,"ylc",1), 0);
+                        current_statement_begin__ = 366;
+                        stan::math::assign(get_base1_lhs(ynlc,k,"ynlc",1), 0);
+                        current_statement_begin__ = 367;
                         stan::math::assign(get_base1_lhs(meanX,k,"meanX",1), 0);
                     }
-                    current_statement_begin__ = 370;
+                    current_statement_begin__ = 373;
                     for (int n = 1; n <= obs; ++n) {
-                        current_statement_begin__ = 373;
+                        current_statement_begin__ = 376;
                         if (as_bool((primitive_value(logical_gt(n,10)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 10),"id_full",1)))))) {
-                            current_statement_begin__ = 374;
+                            current_statement_begin__ = 377;
                             stan::math::assign(get_base1_lhs(cumx10lag,n,"cumx10lag",1), get_base1(cumx,(n - 10),"cumx",1));
-                            current_statement_begin__ = 375;
+                            current_statement_begin__ = 378;
                             stan::math::assign(get_base1_lhs(lhat10lag,n,"lhat10lag",1), get_base1(lhat,(n - 10),"lhat",1));
-                            current_statement_begin__ = 376;
+                            current_statement_begin__ = 379;
                             stan::math::assign(get_base1_lhs(xhat_2_10,n,"xhat_2_10",1), if_else(logical_gt((get_base1(cumx2lag,n,"cumx2lag",1) - get_base1(cumx10lag,n,"cumx10lag",1)),0),(get_base1(cumx2lag,n,"cumx2lag",1) - get_base1(cumx10lag,n,"cumx10lag",1)),0));
                         } else {
-                            current_statement_begin__ = 379;
+                            current_statement_begin__ = 382;
                             stan::math::assign(get_base1_lhs(cumx10lag,n,"cumx10lag",1), 0);
-                            current_statement_begin__ = 380;
+                            current_statement_begin__ = 383;
                             stan::math::assign(get_base1_lhs(lhat10lag,n,"lhat10lag",1), 0);
-                            current_statement_begin__ = 381;
+                            current_statement_begin__ = 384;
                             stan::math::assign(get_base1_lhs(xhat_2_10,n,"xhat_2_10",1), 0);
                         }
-                        current_statement_begin__ = 383;
+                        current_statement_begin__ = 386;
                         if (as_bool((primitive_value(logical_gt(n,5)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 5),"id_full",1)))))) {
-                            current_statement_begin__ = 384;
+                            current_statement_begin__ = 387;
                             stan::math::assign(get_base1_lhs(cumx5lag,n,"cumx5lag",1), get_base1(cumx,(n - 5),"cumx",1));
-                            current_statement_begin__ = 385;
+                            current_statement_begin__ = 388;
                             stan::math::assign(get_base1_lhs(lhat5lag,n,"lhat5lag",1), get_base1(lhat,(n - 5),"lhat",1));
                         } else {
-                            current_statement_begin__ = 388;
+                            current_statement_begin__ = 391;
                             stan::math::assign(get_base1_lhs(cumx5lag,n,"cumx5lag",1), 0);
-                            current_statement_begin__ = 389;
+                            current_statement_begin__ = 392;
                             stan::math::assign(get_base1_lhs(lhat5lag,n,"lhat5lag",1), 0);
                         }
-                        current_statement_begin__ = 391;
+                        current_statement_begin__ = 394;
                         if (as_bool((primitive_value(logical_gt(n,2)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 2),"id_full",1)))))) {
-                            current_statement_begin__ = 392;
-                            stan::math::assign(get_base1_lhs(lhat2lag,n,"lhat2lag",1), get_base1(lhat,(n - 2),"lhat",1));
-                            current_statement_begin__ = 393;
-                            stan::math::assign(get_base1_lhs(cumx2lag,n,"cumx2lag",1), get_base1(cumx,(n - 2),"cumx",1));
-                            current_statement_begin__ = 394;
-                            stan::math::assign(get_base1_lhs(cumx2lagcen,n,"cumx2lagcen",1), ((get_base1(cumx2lag,n,"cumx2lag",1) - meancumwlm2lag) / sdcumwlm2lag));
                             current_statement_begin__ = 395;
-                            stan::math::assign(get_base1_lhs(cuml2lag,n,"cuml2lag",1), get_base1(cuml,(n - 2),"cuml",1));
+                            stan::math::assign(get_base1_lhs(lhat2lag,n,"lhat2lag",1), get_base1(lhat,(n - 2),"lhat",1));
                             current_statement_begin__ = 396;
-                            stan::math::assign(get_base1_lhs(cuml2lagcen,n,"cuml2lagcen",1), ((get_base1(cuml2lag,n,"cuml2lag",1) - meancumyrsexp2lag) / sdcumyrsexp2lag));
+                            stan::math::assign(get_base1_lhs(cumx2lag,n,"cumx2lag",1), get_base1(cumx,(n - 2),"cumx",1));
                             current_statement_begin__ = 397;
+                            stan::math::assign(get_base1_lhs(cumx2lagcen,n,"cumx2lagcen",1), ((get_base1(cumx2lag,n,"cumx2lag",1) - meancumwlm2lag) / sdcumwlm2lag));
+                            current_statement_begin__ = 398;
+                            stan::math::assign(get_base1_lhs(cuml2lag,n,"cuml2lag",1), get_base1(cuml,(n - 2),"cuml",1));
+                            current_statement_begin__ = 399;
+                            stan::math::assign(get_base1_lhs(cuml2lagcen,n,"cuml2lagcen",1), ((get_base1(cuml2lag,n,"cuml2lag",1) - meancumyrsexp2lag) / sdcumyrsexp2lag));
+                            current_statement_begin__ = 400;
                             stan::math::assign(get_base1_lhs(avgexp2lag_full,n,"avgexp2lag_full",1), if_else(logical_gt(get_base1(cuml2lag,n,"cuml2lag",1),0),(get_base1(cumx2lag,n,"cumx2lag",1) / get_base1(cuml2lag,n,"cuml2lag",1)),0));
                         } else {
-                            current_statement_begin__ = 400;
-                            stan::math::assign(get_base1_lhs(lhat2lag,n,"lhat2lag",1), 0);
-                            current_statement_begin__ = 401;
-                            stan::math::assign(get_base1_lhs(cumx2lag,n,"cumx2lag",1), 0);
-                            current_statement_begin__ = 402;
-                            stan::math::assign(get_base1_lhs(cumx2lagcen,n,"cumx2lagcen",1), ((get_base1(cumx2lag,n,"cumx2lag",1) - meancumwlm2lag) / sdcumwlm2lag));
                             current_statement_begin__ = 403;
-                            stan::math::assign(get_base1_lhs(cuml2lag,n,"cuml2lag",1), 0);
+                            stan::math::assign(get_base1_lhs(lhat2lag,n,"lhat2lag",1), 0);
                             current_statement_begin__ = 404;
-                            stan::math::assign(get_base1_lhs(cuml2lagcen,n,"cuml2lagcen",1), ((get_base1(cuml2lag,n,"cuml2lag",1) - meancumyrsexp2lag) / sdcumyrsexp2lag));
+                            stan::math::assign(get_base1_lhs(cumx2lag,n,"cumx2lag",1), 0);
                             current_statement_begin__ = 405;
+                            stan::math::assign(get_base1_lhs(cumx2lagcen,n,"cumx2lagcen",1), ((get_base1(cumx2lag,n,"cumx2lag",1) - meancumwlm2lag) / sdcumwlm2lag));
+                            current_statement_begin__ = 406;
+                            stan::math::assign(get_base1_lhs(cuml2lag,n,"cuml2lag",1), 0);
+                            current_statement_begin__ = 407;
+                            stan::math::assign(get_base1_lhs(cuml2lagcen,n,"cuml2lagcen",1), ((get_base1(cuml2lag,n,"cuml2lag",1) - meancumyrsexp2lag) / sdcumyrsexp2lag));
+                            current_statement_begin__ = 408;
                             stan::math::assign(get_base1_lhs(avgexp2lag_full,n,"avgexp2lag_full",1), if_else(logical_gt(get_base1(cuml2lag,n,"cuml2lag",1),0),(get_base1(cumx2lag,n,"cumx2lag",1) / get_base1(cuml2lag,n,"cuml2lag",1)),0));
                         }
-                        current_statement_begin__ = 412;
+                        current_statement_begin__ = 415;
                         if (as_bool((primitive_value(logical_eq(n,1)) || primitive_value(logical_neq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1)))))) {
-                            current_statement_begin__ = 412;
+                            current_statement_begin__ = 415;
                             stan::math::assign(get_base1_lhs(lhat,n,"lhat",1), 1);
                         } else if (as_bool((primitive_value((primitive_value((primitive_value(logical_gt(n,1)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1))))) && primitive_value(logical_eq(get_base1(lhat,(n - 1),"lhat",1),1)))) && primitive_value(logical_lt(get_base1(date_full,n,"date_full",1),1978))))) {
-                            current_statement_begin__ = 415;
+                            current_statement_begin__ = 418;
                             stan::math::assign(get_base1_lhs(lhat,n,"lhat",1), (1 - bernoulli_rng(inv_logit(((((((((((((((((g0 + (get_base1(g,1,"g",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + ((get_base1(g,2,"g",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (((get_base1(g,3,"g",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (get_base1(g,4,"g",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + ((get_base1(g,5,"g",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (((get_base1(g,6,"g",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (get_base1(g,7,"g",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + ((get_base1(g,8,"g",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (((get_base1(g,9,"g",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (get_base1(g,10,"g",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + ((get_base1(g,11,"g",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (((get_base1(g,12,"g",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (get_base1(g,13,"g",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(g,14,"g",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(g,15,"g",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(g,16,"g",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)))), base_rng__)));
                         } else {
-                            current_statement_begin__ = 435;
+                            current_statement_begin__ = 438;
                             stan::math::assign(get_base1_lhs(lhat,n,"lhat",1), 0);
                         }
-                        current_statement_begin__ = 438;
+                        current_statement_begin__ = 441;
                         if (as_bool((primitive_value(logical_eq(n,1)) || primitive_value(logical_neq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1)))))) {
-                            current_statement_begin__ = 439;
+                            current_statement_begin__ = 442;
                             stan::math::assign(get_base1_lhs(cuml,n,"cuml",1), get_base1(lhat,n,"lhat",1));
-                            current_statement_begin__ = 440;
+                            current_statement_begin__ = 443;
                             stan::math::assign(get_base1_lhs(cumlcen,n,"cumlcen",1), ((get_base1(cuml,n,"cuml",1) - meancumyrsexp) / sdcumyrsexp));
                         } else if (as_bool((primitive_value(logical_gt(n,1)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1)))))) {
-                            current_statement_begin__ = 443;
+                            current_statement_begin__ = 446;
                             stan::math::assign(get_base1_lhs(cuml,n,"cuml",1), (get_base1(cuml,(n - 1),"cuml",1) + get_base1(lhat,n,"lhat",1)));
-                            current_statement_begin__ = 444;
+                            current_statement_begin__ = 447;
                             stan::math::assign(get_base1_lhs(cumlcen,n,"cumlcen",1), ((get_base1(cuml,n,"cuml",1) - meancumyrsexp) / sdcumyrsexp));
                         }
-                        current_statement_begin__ = 449;
+                        current_statement_begin__ = 452;
                         if (as_bool(logical_eq(get_base1(lhat,n,"lhat",1),1))) {
-                            current_statement_begin__ = 450;
+                            current_statement_begin__ = 453;
                             stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 4500);
-                            current_statement_begin__ = 451;
+                            current_statement_begin__ = 454;
                             stan::math::assign(rep, 0);
-                            current_statement_begin__ = 452;
+                            current_statement_begin__ = 455;
                             while (as_bool(logical_gt(get_base1(xhat,n,"xhat",1),4000))) {
-                                current_statement_begin__ = 453;
+                                current_statement_begin__ = 456;
                                 stan::math::assign(rep, (rep + 1));
-                                current_statement_begin__ = 454;
+                                current_statement_begin__ = 457;
                                 stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), (1000 * exp(normal_rng((((((((((((((((((a0 + (get_base1(a,1,"a",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + ((get_base1(a,2,"a",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (((get_base1(a,3,"a",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (get_base1(a,4,"a",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + ((get_base1(a,5,"a",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (((get_base1(a,6,"a",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (get_base1(a,7,"a",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + ((get_base1(a,8,"a",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (((get_base1(a,9,"a",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (get_base1(a,10,"a",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + ((get_base1(a,11,"a",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (((get_base1(a,12,"a",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (get_base1(a,13,"a",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(a,14,"a",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(a,15,"a",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(a,16,"a",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1))) + (((get_base1(a,17,"a",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1))),sigma2, base_rng__))));
-                                current_statement_begin__ = 475;
+                                current_statement_begin__ = 478;
                                 if (as_bool(logical_gt(rep,10))) {
-                                    current_statement_begin__ = 477;
+                                    current_statement_begin__ = 480;
                                     if (pstream__) {
                                         stan_print(pstream__,"exposure model wacky");
                                         *pstream__ << std::endl;
                                     }
-                                    current_statement_begin__ = 477;
-                                    current_statement_begin__ = 478;
+                                    current_statement_begin__ = 480;
+                                    current_statement_begin__ = 481;
                                     stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 4000);
                                 }
                             }
                         } else if (as_bool(logical_eq(get_base1(lhat,n,"lhat",1),0))) {
-                            current_statement_begin__ = 483;
+                            current_statement_begin__ = 486;
                             stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 0);
                         }
-                        current_statement_begin__ = 486;
+                        current_statement_begin__ = 489;
                         if (as_bool((primitive_value(logical_eq(interv,1)) && primitive_value(logical_gt(get_base1(xhat,n,"xhat",1),24))))) {
-                            current_statement_begin__ = 487;
+                            current_statement_begin__ = 490;
                             stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 24);
                         }
-                        current_statement_begin__ = 489;
+                        current_statement_begin__ = 492;
                         if (as_bool((primitive_value(logical_eq(interv,2)) && primitive_value(logical_gt(get_base1(xhat,n,"xhat",1),12))))) {
-                            current_statement_begin__ = 490;
+                            current_statement_begin__ = 493;
                             stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 12);
                         }
-                        current_statement_begin__ = 492;
+                        current_statement_begin__ = 495;
                         if (as_bool((primitive_value(logical_eq(interv,3)) && primitive_value(logical_gt(get_base1(xhat,n,"xhat",1),4))))) {
-                            current_statement_begin__ = 493;
+                            current_statement_begin__ = 496;
                             stan::math::assign(get_base1_lhs(xhat,n,"xhat",1), 4);
                         }
-                        current_statement_begin__ = 497;
+                        current_statement_begin__ = 500;
                         if (as_bool((primitive_value(logical_eq(n,1)) || primitive_value(logical_neq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1)))))) {
-                            current_statement_begin__ = 498;
+                            current_statement_begin__ = 501;
                             stan::math::assign(get_base1_lhs(cumx,n,"cumx",1), get_base1(xhat,n,"xhat",1));
                         }
-                        current_statement_begin__ = 500;
+                        current_statement_begin__ = 503;
                         if (as_bool((primitive_value(logical_gt(n,1)) && primitive_value(logical_eq(get_base1(id_full,n,"id_full",1),get_base1(id_full,(n - 1),"id_full",1)))))) {
-                            current_statement_begin__ = 501;
+                            current_statement_begin__ = 504;
                             stan::math::assign(get_base1_lhs(cumx,n,"cumx",1), (get_base1(cumx,(n - 1),"cumx",1) + get_base1(xhat,n,"xhat",1)));
                         }
-                        current_statement_begin__ = 507;
-                        stan::math::assign(get_base1_lhs(h_lcn,n,"h_lcn",1), inv_logit((((((((((b0 + (get_base1(b,3,"b",1) * get_base1(cumlcen,n,"cumlcen",1))) + ((get_base1(b,4,"b",1) * get_base1(cumlcen,n,"cumlcen",1)) * get_base1(cumlcen,n,"cumlcen",1))) + (get_base1(b,6,"b",1) * get_base1(xhat_2_10,n,"xhat_2_10",1))) + (get_base1(b,7,"b",1) * get_base1(cumx10lag,n,"cumx10lag",1))) + (get_base1(b,8,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(b,9,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (((get_base1(b,10,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(b,11,"b",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(b,12,"b",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)))));
-                        current_statement_begin__ = 530;
-                        stan::math::assign(get_base1_lhs(h_nlcn,n,"h_nlcn",1), inv_logit((((((((c0 + (get_base1(c,1,"c",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (get_base1(c,3,"c",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (get_base1(c,8,"c",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (get_base1(c,10,"c",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(c,11,"c",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(c,14,"c",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(c,15,"c",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)))));
-                        current_statement_begin__ = 550;
+                        current_statement_begin__ = 510;
+                        stan::math::assign(get_base1_lhs(h_lcn,n,"h_lcn",1), inv_logit((((((((((((((((((b0 + (get_base1(b,1,"b",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + ((get_base1(b,2,"b",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (((get_base1(b,3,"b",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (get_base1(b,4,"b",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + ((get_base1(b,5,"b",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (((get_base1(b,6,"b",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (get_base1(b,7,"b",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + ((get_base1(b,8,"b",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (((get_base1(b,9,"b",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (get_base1(b,10,"b",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + ((get_base1(b,11,"b",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (((get_base1(b,12,"b",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (get_base1(b,13,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(b,14,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (((get_base1(b,15,"b",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(b,16,"b",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(b,17,"b",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)))));
+                        current_statement_begin__ = 533;
+                        stan::math::assign(get_base1_lhs(h_nlcn,n,"h_nlcn",1), inv_logit((((((((((((((((((c0 + (get_base1(c,1,"c",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + ((get_base1(c,2,"c",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (((get_base1(c,3,"c",1) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1)) * get_base1(BL_cumwlm_fullcen,n,"BL_cumwlm_fullcen",1))) + (get_base1(c,4,"c",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + ((get_base1(c,5,"c",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (((get_base1(c,6,"c",1) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1)) * get_base1(BL_cumyrsexp_fullcen,n,"BL_cumyrsexp_fullcen",1))) + (get_base1(c,7,"c",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + ((get_base1(c,8,"c",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (((get_base1(c,9,"c",1) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1)) * get_base1(cuml2lagcen,n,"cuml2lagcen",1))) + (get_base1(c,10,"c",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + ((get_base1(c,11,"c",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (((get_base1(c,12,"c",1) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1)) * get_base1(cumx2lagcen,n,"cumx2lagcen",1))) + (get_base1(c,13,"c",1) * get_base1(age_fullcen,n,"age_fullcen",1))) + ((get_base1(c,14,"c",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (((get_base1(c,15,"c",1) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1)) * get_base1(age_fullcen,n,"age_fullcen",1))) + (get_base1(c,16,"c",1) * get_base1(date_fullcen,n,"date_fullcen",1))) + ((get_base1(c,17,"c",1) * get_base1(date_fullcen,n,"date_fullcen",1)) * get_base1(date_fullcen,n,"date_fullcen",1)))));
+                        current_statement_begin__ = 555;
                         for (int k = 1; k <= J; ++k) {
-                            current_statement_begin__ = 552;
+                            current_statement_begin__ = 557;
                             if (as_bool(logical_eq(get_base1(age_full,n,"age_full",1),((k + minT) - 1)))) {
-                                current_statement_begin__ = 554;
+                                current_statement_begin__ = 559;
                                 stan::math::assign(get_base1_lhs(R,k,"R",1), (get_base1(R,k,"R",1) + 1));
-                                current_statement_begin__ = 556;
+                                current_statement_begin__ = 561;
                                 stan::math::assign(get_base1_lhs(ylc,k,"ylc",1), (get_base1(ylc,k,"ylc",1) + get_base1(h_lcn,n,"h_lcn",1)));
-                                current_statement_begin__ = 557;
+                                current_statement_begin__ = 562;
                                 stan::math::assign(get_base1_lhs(ynlc,k,"ynlc",1), (get_base1(ynlc,k,"ynlc",1) + get_base1(h_nlcn,n,"h_nlcn",1)));
-                                current_statement_begin__ = 558;
+                                current_statement_begin__ = 563;
                                 stan::math::assign(get_base1_lhs(meanX,k,"meanX",1), (get_base1(meanX,k,"meanX",1) + get_base1(xhat,n,"xhat",1)));
                             }
                         }
-                        current_statement_begin__ = 561;
+                        current_statement_begin__ = 566;
                         if (as_bool((primitive_value(logical_eq(get_base1(age_full,n,"age_full",1),maxT)) || primitive_value(logical_eq(get_base1(age_full,n,"age_full",1),get_base1(maxage_full,n,"maxage_full",1)))))) {
-                            current_statement_begin__ = 562;
+                            current_statement_begin__ = 567;
                             stan::math::assign(get_base1_lhs(meanCumX,interv,"meanCumX",1), (get_base1(meanCumX,interv,"meanCumX",1) + (get_base1(cumx,n,"cumx",1) / N)));
-                            current_statement_begin__ = 563;
+                            current_statement_begin__ = 568;
                             stan::math::assign(get_base1_lhs(meanWkyrs,interv,"meanWkyrs",1), (get_base1(meanWkyrs,interv,"meanWkyrs",1) + (get_base1(cuml,n,"cuml",1) / N)));
                         }
                     }
-                    current_statement_begin__ = 567;
+                    current_statement_begin__ = 572;
                     for (int k = 1; k <= J; ++k) {
-                        current_statement_begin__ = 569;
+                        current_statement_begin__ = 574;
                         stan::math::assign(get_base1_lhs(ylc,k,"ylc",1), (get_base1(ylc,k,"ylc",1) / get_base1(R,k,"R",1)));
-                        current_statement_begin__ = 570;
+                        current_statement_begin__ = 575;
                         stan::math::assign(get_base1_lhs(ynlc,k,"ynlc",1), (get_base1(ynlc,k,"ynlc",1) / get_base1(R,k,"R",1)));
-                        current_statement_begin__ = 571;
+                        current_statement_begin__ = 576;
                         stan::math::assign(get_base1_lhs(meanX,k,"meanX",1), (get_base1(meanX,k,"meanX",1) / get_base1(R,k,"R",1)));
-                        current_statement_begin__ = 572;
+                        current_statement_begin__ = 577;
                         stan::math::assign(get_base1_lhs(y_ac,k,"y_ac",1), (get_base1(ylc,k,"ylc",1) + get_base1(ynlc,k,"ynlc",1)));
                     }
-                    current_statement_begin__ = 578;
+                    current_statement_begin__ = 583;
                     if (as_bool(logical_eq(interv,1))) {
-                        current_statement_begin__ = 580;
+                        current_statement_begin__ = 585;
                         stan::math::assign(get_base1_lhs(surv_2,1,"surv_2",1), (1 - (get_base1(ylc,1,"ylc",1) + get_base1(ynlc,1,"ynlc",1))));
-                        current_statement_begin__ = 581;
+                        current_statement_begin__ = 586;
                         stan::math::assign(get_base1_lhs(cilc_2,1,"cilc_2",1), get_base1(ylc,1,"ylc",1));
-                        current_statement_begin__ = 582;
+                        current_statement_begin__ = 587;
                         stan::math::assign(get_base1_lhs(cinlc_2,1,"cinlc_2",1), get_base1(ynlc,1,"ynlc",1));
-                        current_statement_begin__ = 583;
+                        current_statement_begin__ = 588;
                         for (int k = 2; k <= J; ++k) {
-                            current_statement_begin__ = 584;
+                            current_statement_begin__ = 589;
                             stan::math::assign(get_base1_lhs(surv_2,k,"surv_2",1), ((1 - (get_base1(ylc,k,"ylc",1) + get_base1(ynlc,k,"ynlc",1))) * get_base1(surv_2,(k - 1),"surv_2",1)));
-                            current_statement_begin__ = 585;
+                            current_statement_begin__ = 590;
                             stan::math::assign(get_base1_lhs(cilc_2,k,"cilc_2",1), (get_base1(cilc_2,(k - 1),"cilc_2",1) + (get_base1(ylc,k,"ylc",1) * get_base1(surv_2,(k - 1),"surv_2",1))));
-                            current_statement_begin__ = 586;
+                            current_statement_begin__ = 591;
                             stan::math::assign(get_base1_lhs(cinlc_2,k,"cinlc_2",1), (get_base1(cinlc_2,(k - 1),"cinlc_2",1) + (get_base1(ynlc,k,"ynlc",1) * get_base1(surv_2,(k - 1),"surv_2",1))));
                         }
                     }
-                    current_statement_begin__ = 590;
+                    current_statement_begin__ = 595;
                     if (as_bool(logical_eq(interv,2))) {
-                        current_statement_begin__ = 592;
+                        current_statement_begin__ = 597;
                         stan::math::assign(get_base1_lhs(surv_1,1,"surv_1",1), (1 - (get_base1(ylc,1,"ylc",1) + get_base1(ynlc,1,"ynlc",1))));
-                        current_statement_begin__ = 593;
+                        current_statement_begin__ = 598;
                         stan::math::assign(get_base1_lhs(cilc_1,1,"cilc_1",1), get_base1(ylc,1,"ylc",1));
-                        current_statement_begin__ = 594;
+                        current_statement_begin__ = 599;
                         stan::math::assign(get_base1_lhs(cinlc_1,1,"cinlc_1",1), get_base1(ynlc,1,"ynlc",1));
-                        current_statement_begin__ = 595;
+                        current_statement_begin__ = 600;
                         for (int k = 2; k <= J; ++k) {
-                            current_statement_begin__ = 596;
+                            current_statement_begin__ = 601;
                             stan::math::assign(get_base1_lhs(surv_1,k,"surv_1",1), ((1 - (get_base1(ylc,k,"ylc",1) + get_base1(ynlc,k,"ynlc",1))) * get_base1(surv_1,(k - 1),"surv_1",1)));
-                            current_statement_begin__ = 597;
+                            current_statement_begin__ = 602;
                             stan::math::assign(get_base1_lhs(cilc_1,k,"cilc_1",1), (get_base1(cilc_1,(k - 1),"cilc_1",1) + (get_base1(ylc,k,"ylc",1) * get_base1(surv_1,(k - 1),"surv_1",1))));
-                            current_statement_begin__ = 598;
+                            current_statement_begin__ = 603;
                             stan::math::assign(get_base1_lhs(cinlc_1,k,"cinlc_1",1), (get_base1(cinlc_1,(k - 1),"cinlc_1",1) + (get_base1(ynlc,k,"ynlc",1) * get_base1(surv_1,(k - 1),"surv_1",1))));
                         }
                     }
-                    current_statement_begin__ = 601;
+                    current_statement_begin__ = 606;
                     if (as_bool(logical_eq(interv,3))) {
-                        current_statement_begin__ = 603;
+                        current_statement_begin__ = 608;
                         stan::math::assign(get_base1_lhs(surv_33,1,"surv_33",1), (1 - (get_base1(ylc,1,"ylc",1) + get_base1(ynlc,1,"ynlc",1))));
-                        current_statement_begin__ = 604;
+                        current_statement_begin__ = 609;
                         stan::math::assign(get_base1_lhs(cilc_33,1,"cilc_33",1), get_base1(ylc,1,"ylc",1));
-                        current_statement_begin__ = 605;
+                        current_statement_begin__ = 610;
                         stan::math::assign(get_base1_lhs(cinlc_33,1,"cinlc_33",1), get_base1(ynlc,1,"ynlc",1));
-                        current_statement_begin__ = 606;
+                        current_statement_begin__ = 611;
                         for (int k = 2; k <= J; ++k) {
-                            current_statement_begin__ = 607;
+                            current_statement_begin__ = 612;
                             stan::math::assign(get_base1_lhs(surv_33,k,"surv_33",1), ((1 - (get_base1(ylc,k,"ylc",1) + get_base1(ynlc,k,"ynlc",1))) * get_base1(surv_33,(k - 1),"surv_33",1)));
-                            current_statement_begin__ = 608;
+                            current_statement_begin__ = 613;
                             stan::math::assign(get_base1_lhs(cilc_33,k,"cilc_33",1), (get_base1(cilc_1,(k - 1),"cilc_1",1) + (get_base1(ylc,k,"ylc",1) * get_base1(surv_33,(k - 1),"surv_33",1))));
-                            current_statement_begin__ = 609;
+                            current_statement_begin__ = 614;
                             stan::math::assign(get_base1_lhs(cinlc_33,k,"cinlc_33",1), (get_base1(cinlc_1,(k - 1),"cinlc_1",1) + (get_base1(ynlc,k,"ynlc",1) * get_base1(surv_33,(k - 1),"surv_33",1))));
                         }
                     }
-                    current_statement_begin__ = 612;
+                    current_statement_begin__ = 617;
                     if (as_bool(logical_eq(interv,4))) {
-                        current_statement_begin__ = 614;
+                        current_statement_begin__ = 619;
                         stan::math::assign(get_base1_lhs(surv_nc,1,"surv_nc",1), (1 - (get_base1(ylc,1,"ylc",1) + get_base1(ynlc,1,"ynlc",1))));
-                        current_statement_begin__ = 615;
+                        current_statement_begin__ = 620;
                         stan::math::assign(get_base1_lhs(cilc_nc,1,"cilc_nc",1), get_base1(ylc,1,"ylc",1));
-                        current_statement_begin__ = 616;
+                        current_statement_begin__ = 621;
                         stan::math::assign(get_base1_lhs(cinlc_nc,1,"cinlc_nc",1), get_base1(ynlc,1,"ynlc",1));
-                        current_statement_begin__ = 617;
+                        current_statement_begin__ = 622;
                         for (int k = 2; k <= J; ++k) {
-                            current_statement_begin__ = 618;
+                            current_statement_begin__ = 623;
                             stan::math::assign(get_base1_lhs(surv_nc,k,"surv_nc",1), ((1 - (get_base1(ylc,k,"ylc",1) + get_base1(ynlc,k,"ynlc",1))) * get_base1(surv_nc,(k - 1),"surv_nc",1)));
-                            current_statement_begin__ = 619;
+                            current_statement_begin__ = 624;
                             stan::math::assign(get_base1_lhs(cilc_nc,k,"cilc_nc",1), (get_base1(cilc_nc,(k - 1),"cilc_nc",1) + (get_base1(ylc,k,"ylc",1) * get_base1(surv_nc,(k - 1),"surv_nc",1))));
-                            current_statement_begin__ = 620;
+                            current_statement_begin__ = 625;
                             stan::math::assign(get_base1_lhs(cinlc_nc,k,"cinlc_nc",1), (get_base1(cinlc_nc,(k - 1),"cinlc_nc",1) + (get_base1(ynlc,k,"ynlc",1) * get_base1(surv_nc,(k - 1),"surv_nc",1))));
                         }
                     }
