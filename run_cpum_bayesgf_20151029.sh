@@ -38,6 +38,7 @@ cd ~/EpiProjects/CPUM/code/
 #after fixing centering issue: .26
 #after fixing employment status post 1977: 0.25
 #giving baseline, exposure, work time more polynomial terms: 0.11 (lp =  -8563.5)
+#further refine using frequentist model specific deviances: 
 #time only: 0.092
 
 
@@ -59,7 +60,8 @@ cd ~/EpiProjects/CPUM/code/
 #remove time-fixed, cal time: 0.19
 #after fixing centering issue: 0.17
 #after fixing employment status post 1977: 0.18
-#giving baseline, exposure, work time more polynomial terms: 
+#giving baseline, exposure, work time more polynomial terms: 0.21 (lp = -40642)
+#
 #time only: 0.16
 
 

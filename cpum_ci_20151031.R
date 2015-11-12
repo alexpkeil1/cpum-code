@@ -59,25 +59,53 @@ chazlw_cox <- cumsum(ifelse(sfw$n.risk>0, sfw$n.event/sfw$n.risk, 0))
 #method 2
 sbh <- basehaz(coxph(Surv(agein, ageout, d_any)~1, data=dat))
 sbh_lc <- basehaz(coxph(Surv(agein, ageout, d_lc)~1, data=dat, ties="breslow"))
+sbh_nlc <- basehaz(coxph(Surv(agein, ageout, d_nonlc)~1, data=dat, ties="breslow"))
 sbh$s <- exp(-(sbh$hazard))
 sbh$lc_ci <- cumsum(diff(c(0, sbh_lc$hazard[]))*sbh$s)
+sbh$nlc_ci <- cumsum(diff(c(0, sbh_nlc$hazard[]))*sbh$s)
 
 #by date
 sbd <- basehaz(coxph(Surv(datein, dateout, d_any)~1, data=dat))
 sbd_lc <- basehaz(coxph(Surv(datein, dateout, d_lc)~1, data=dat, ties="breslow"))
+sbd_nlc <- basehaz(coxph(Surv(datein, dateout, d_nonlc)~1, data=dat, ties="breslow"))
 sbd$s <- exp(-(sbd$hazard))
 sbd$lc_ci <- cumsum(diff(c(0, sbd_lc$hazard[]))*sbd$s)
+sbd$nlc_ci <- cumsum(diff(c(0, sbd_nlc$hazard[]))*sbd$s)
 
 sbdf <- basehaz(coxph(Surv(datein, dateout, d_any)~1, data=datf))
 sbd_lcf <- basehaz(coxph(Surv(datein, dateout, d_lc)~1, data=datf, ties="breslow"))
+sbd_nlcf <- basehaz(coxph(Surv(datein, dateout, d_nonlc)~1, data=datf, ties="breslow"))
 sbdf$s <- exp(-(sbdf$hazard))
 sbdf$lc_ci <- cumsum(diff(c(0, sbd_lcf$hazard[]))*sbdf$s)
+sbdf$nlc_ci <- cumsum(diff(c(0, sbd_nlcf$hazard[]))*sbdf$s)
 
 
 
 ggplot() + 
-  geom_line(aes(x,y, linetype="NA"), data=data.frame(x=sbdf$time,y=sbdf$lc_ci)) +
-  geom_line(aes(x,y, linetype="Everyone"), data=data.frame(x=sbd$time,y=sbd$lc_ci)) 
+  geom_line(aes(x,y, linetype="NA"), data=data.frame(x=sbdf$time,y=1-sbdf$s)) +
+  geom_line(aes(x,y, linetype="Everyone"), data=data.frame(x=sbd$time,y=1-sbd$s)) 
+
+#nc other causes
+ncnlc <- c(0.00694773, 0.0138925, 0.0208073, 0.0277436, 0.0344697, 0.0410527, 0.0475538, 0.053991, 0.0602973, 0.0665536, 0.0727923, 0.0789681, 0.0851328, 0.0912856, 0.0974611, 0.10368, 0.109972, 0.116305, 0.122725, 0.129254, 0.13589, 0.14256, 0.149333, 0.156204, 0.163187, 0.17031, 0.177522, 0.184829, 0.192275, 0.199863, 0.207601, 0.215527, 0.223642, 0.23196, 0.240488, 0.249234, 0.258207, 0.267424, 0.276883, 0.286593, 0.296564, 0.306808, 0.317304, 0.328081, 0.339153, 0.350521, 0.362157, 0.374103, 0.386335, 0.398877, 0.411739, 0.424944, 0.438512, 0.452444, 0.466754, 0.481489, 0.496625, 0.512186, 0.528101, 0.544432, 0.561126, 0.578287, 0.595782, 0.613472, 0.631413, 0.649477, 0.667675, 0.685908, 0.704047, 0.721821, 0.739137, 0.755809, 0.771625)
+nclc <- c(1.54E-05, 3.80E-05, 6.75E-05, 0.000111075, 0.000168378, 0.000241729, 0.000335935, 0.000453586, 0.00059496, 0.000773599, 0.000992451, 0.0012517, 0.00156424, 0.00193924, 0.00238813, 0.00291479, 0.00352491, 0.00422152, 0.00501658, 0.00592407, 0.00693891, 0.0080398, 0.00924794, 0.0105579, 0.0119707, 0.0134981, 0.0151216, 0.016837, 0.0186574, 0.0205771, 0.0225968, 0.0247267, 0.0269562, 0.0292858, 0.0317117, 0.034232, 0.0368386, 0.0395312, 0.0422968, 0.0451246, 0.0480094, 0.0509444, 0.0539067, 0.0568969, 0.0599073, 0.0629262, 0.0659272, 0.0689212, 0.0718879, 0.0748169, 0.07771, 0.0805707, 0.0834099, 0.0862106, 0.0889439, 0.0916315, 0.0942592, 0.0967371, 0.0990966, 0.101389, 0.103652, 0.105842, 0.10798, 0.110009, 0.111926, 0.113722, 0.1155, 0.117226, 0.118903, 0.120476, 0.121857, 0.123129, 0.124324)
+nct <- 17+1:73
+
+ggplot() + 
+  geom_line(aes(x,y, linetype="all"), data=data.frame(x=nct,y=ncnlc)) +
+  geom_line(aes(x,y, linetype="other"), data=data.frame(x=sbh$time,y=sbh$nlc_ci))
+
+ggplot() + 
+  geom_line(aes(x,y, linetype="all"), data=data.frame(x=nct,y=nclc)) +
+  geom_line(aes(x,y, linetype="other"), data=data.frame(x=sbh$time,y=sbh$lc_ci))
+
+ggplot() + 
+  geom_line(aes(x,y, linetype="all"), data=data.frame(x=sbh$time,y=1-sbh$s)) +
+  geom_line(aes(x,y, linetype="other"), data=data.frame(x=sbh$time,y=sbh$nlc_ci)) +
+  geom_line(aes(x,y, linetype="LC"), data=data.frame(x=sbh$time,y=sbh$lc_ci)) 
+
+ggplot() + 
+  geom_line(aes(x,y, linetype="NA"), data=data.frame(x=sbdf$time,y=sbdf$nlc_ci)) +
+  geom_line(aes(x,y, linetype="Everyone"), data=data.frame(x=sbd$time,y=sbd$nlc_ci)) 
 
 
 sum(sflc$n.event)

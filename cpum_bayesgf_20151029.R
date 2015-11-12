@@ -25,8 +25,8 @@ an <- read_sas("~/EpiProjects/CPUM/data/an0001.sas7bdat")
 #variables to keep
 #restrict to nonwhites
 switch=0 #indicator to help avoid running a problem below with defining exposures after baseline if running multiple times
-#dim(dat <- an[an$race==2 & !is.na(an$smoke3_2),])
-dim(dat <- an[!is.na(an$smoke3_2),]) #keep everybody with non-missing smoking data
+dim(dat <- an[an$race==2 & !is.na(an$smoke3_2),])
+#dim(dat <- an[!is.na(an$smoke3_2),]) #keep everybody with non-missing smoking data
 
 
 dat$maxage = pmin(90, ceiling(dat$ageatadmincens))
@@ -120,12 +120,12 @@ summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^
 summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[!is.na(dat$smoke3_2)], family=binomial))
 
 #checking that frequentist models will run (NA)
-summary(glm(leftwork ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + cumwlm2lag + I(cumwlm2lag^2) + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[(dat$atwork==1 | dat$leftwork==1) & dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
-summary(glm(log(wlm/1000) ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp + I(cumyrsexp^2) + I(cumyrsexp^3) + cumwlm2lag + I(cumwlm2lag^2) + I(cumwlm2lag^3) + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$atwork==1 & dat$wlm>0 & dat$race==2 & !is.na(dat$smoke3_2),], family=gaussian))
-summary(glm(d_lc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
-summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp + cohort_1 + cumyrsexp+ I(cumyrsexp^2) + atwork2lag + cumwlm2lag + ageout + I(ageout^2)+ I(ageout^3)+ I(ageout^4) + dateout + I(dateout^2) + I(dateout^3), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
+summary(glm(leftwork ~ BL_cumwlm + I(BL_cumwlm^2) + I(BL_cumwlm^3) + BL_cumyrsexp + I(BL_cumyrsexp^2) + I(BL_cumyrsexp^3) + cumyrsexp+ I(cumyrsexp^2) + I(cumyrsexp^3) + cumwlm2lag + I(cumwlm2lag^2) + I(cumwlm2lag^3) + ageout + I(ageout^2) + dateout + I(dateout^2), data=dat[dat$dateout<1977.5 & (dat$atwork==1 | dat$leftwork==1) & dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
+summary(glm(log(wlm/1000) ~BL_cumwlm + I(BL_cumwlm^2) + I(BL_cumwlm^3) + BL_cumyrsexp + I(BL_cumyrsexp^2) + I(BL_cumyrsexp^3) + cumyrsexp+ I(cumyrsexp^2) + I(cumyrsexp^3) + cumwlm2lag + I(cumwlm2lag^2) + I(cumwlm2lag^3) + ageout + I(ageout^2) + dateout + I(dateout^2)+ I(dateout^3), data=dat[dat$atwork==1 & dat$wlm>0 & dat$race==2 & !is.na(dat$smoke3_2),], family=gaussian))
+summary(glm(d_lc ~ I(sqrt(BL_cumwlm))  + BL_cumyrsexp + cumyrsexp + I(cumyrsexp^2) + cumwlm2lag + I(cumwlm2lag^2) + atwork2lag + ageout + I(ageout^2)+ I(ageout^3) + dateout + I(dateout^2), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
+summary(glm(d_nonlc ~ BL_cumwlm + BL_cumyrsexp  + cumwlm2lag  + ageout + I(ageout^2) + dateout + I(dateout^2), data=dat[dat$race==2 & !is.na(dat$smoke3_2),], family=binomial))
 
-
+(3688.1 + 8827.4 + 774.32 + 3652.1)/-2
 
 # source("/Users/akeil/Documents/programming_examples/STAN/make_stan_terms.R")
 # 
