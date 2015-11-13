@@ -22,7 +22,7 @@ cd ~/EpiProjects/CPUM/code/
 ######  are adequately debugged to give an answer
 ./$ROOT \
     method=optimize \
-    algorithm=lbfgs iter=10000 save_iterations=0\
+    algorithm=lbfgs iter=20000 save_iterations=0\
     data file=~/EpiProjects/CPUM/data/cpum_bayesgf_20151029_data.standata \
 	output file=~/EpiProjects/CPUM/output/${ROOT}_optim.csv  \
 	random seed=${RANDOM}  
