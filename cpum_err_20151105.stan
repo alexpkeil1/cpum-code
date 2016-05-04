@@ -97,25 +97,21 @@ parameters{
 //    real d[9];  // loglinear term 2
 }
 transformed parameters{
-
-
-
 }
 model{
 //      a0 ~ normal(0, 5); // uniform prior if commented out
 //      d0 ~ normal(0, 100); // uniform prior if commented out
 //      lnrr ~ normal(0, 20);
-//        err ~ normal(3, 0.1) T[0, ];
+        err ~ normal(-1/maxX, 10) T[-1/maxX, ];
+//        err ~ chi_square(2);
         
-//        a ~ normal(0, 11);
+        a0 ~ normal(0, 10);
         { 
-            row_vector[obscomplete] lambda;
+            row_vector[obscomplete] mu;
             for(n in 1:obscomplete){
-                lambda[n] <- py[n] * exp(a0) * (1 + err*cumwlm2lag[n]/100);   // linear RR model
-
+                mu[n] <-  py[n]/10000 * exp(a0) * (1 + err*cumwlm2lag[n]/100);   // linear ERR model
         }
-        /// err model
-        d_lc ~ poisson(lambda);
+        d_lc ~ poisson(mu);
 }
 
 }

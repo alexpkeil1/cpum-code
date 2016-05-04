@@ -18,7 +18,7 @@ source("~/Documents/programming_examples/R/_mine/da_spline_ak.R", echo=TRUE)
 
 library(haven)
 library(rstan)
-library(gnm)
+#library(gnm)
 
 #an2 <- read_sas("~/EpiProjects/CPUM/data/cpum_gf01.sas7bdat")
 an <- read_sas("~/EpiProjects/CPUM/data/an0001.sas7bdat")
