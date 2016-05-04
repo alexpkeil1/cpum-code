@@ -1,0 +1,4 @@
+*.hpp
+*.csv
+run_bayes*
+.Rhistory
