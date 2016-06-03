@@ -226,7 +226,7 @@ PROC MEANS DATA = extratime SUM N MAX;
  VAR extratime; *566 person years among 420 people;
 RUN;
 
-DATA exp_eligwide (DROP=datein dateout wlmrt emp wlm  dob eligdate dlo agein ageout age_fe eligage
+DATA exp_eligwide (DROP=datein dateout wlmrt emp wlm dob eligdate dlo agein ageout age_fe eligage
                        err year inc incbl yrs_exposed cum_yrs_exposed termage atrisk date_fe) err(KEEP=err id agein ageout datein dateout wlmrt )
       /*test*/;
  LENGTH id cumwlm cumwlm cumyrsexp cum_yrs_exposed BL_cumwlm BL_cumyrsexp 8;
@@ -339,6 +339,72 @@ DATA exp_allwide (DROP=datein dateout wlmrt emp wlm  dob eligdate dlo agein ageo
     ELSE IF agein > year AND ageout < year+.999999 THEN incbl =  (ageout - agein) + 1/(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *mid-year year;
     ELSE IF agein = year AND ageout = agein THEN incbl = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
     ELSE IF agein = year + 1-1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1) AND ageout = agein THEN incbl = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
+    inc=incbl;
+   END;
+   IF agein < eligage < ageout THEN ERR=4;
+    BL_cumyrsexp =  BL_cumyrsexp + incbl;
+    BL_cumwlm =  BL_cumwlm + wlmrt * incbl*(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1);
+    pyexp[year] = pyexp[year] + inc ;
+    annwlm[year] = annwlm[year] + wlmrt * inc*(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *close enough;
+  END; *end exposure in year;
+ END;
+ cumyrsexp = SUM(OF pyexp[*]);
+ cumwlm = SUM(OF annwlm[*]);
+ IF ageout=agein THEN err=0;
+ IF ageout<agein THEN err=1;
+ IF agein<&agebegin THEN err=2;
+ IF agein>&ageend OR ageout>&ageend THEN err=3;
+ IF last.id THEN OUTPUT exp_allwide;
+ IF err>.z THEN OUTPUT err;
+ *OUTPUT TEST;
+RUN;
+
+DATA exp_blwide (DROP=datein dateout wlmrt emp wlm  dob eligdate dlo agein ageout  age_fe eligage
+                       err year inc yrs_exposed cum_yrs_exposed cumwlm) err(KEEP=err id agein ageout datein dateout wlmrt );
+  LENGTH id cumwlm cumwlm cumyrsexp cum_yrs_exposed BL_cumwlm BL_cumyrsexp 8;
+ LENGTH err 8; *simple error handling;
+
+ SET exp_anywide;
+ ARRAY annwlm[&agebegin:&ageend] annblwlm&agebegin-annblwlm&ageend;
+ ARRAY anyexp[&agebegin:&ageend] anyblexp&agebegin-anyblexp&ageend;
+ ARRAY pyexp[&agebegin:&ageend] pyblexp&agebegin-pyblexp&ageend;
+
+ BY id datein;
+ RETAIN BL_cumwlm BL_cumyrsexp cumwlm cumyrsexp cumyrsatwork anyblexp&agebegin-anyblexp&ageend pyblexp&agebegin-pyblexp&ageend annblwlm&agebegin-annblwlm&ageend ;
+ IF first.id THEN DO;
+ cumwlm=0;
+ cumyrsexp=0;
+ cumyrsatwork=0;
+ BL_cumwlm=0;
+ BL_cumyrsexp=0;
+  DO year = &agebegin TO &ageend;
+   pyexp[year]=0;
+   annwlm[year]=0;
+   anyexp[year]=0;
+  END;
+ END;*first.id;
+ DO year = &agebegin TO &ageend;
+  IF FLOOR(agein) <= year AND FLOOR(ageout) => year 
+   THEN DO; *in exposure period;
+   *any exposure;
+   anyexp[year] = 1;
+   *days of exposure in the year;
+   IF atrisk THEN DO; *whole period eligible (due to previously splitting records by eligdate);
+    IF agein <= year AND ageout >= year+.999999 THEN inc =  1; *whole year;
+    ELSE IF agein > year AND ageout >= year+.999999 THEN inc = (year+1 - agein) /*+ 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1)*/; *last part of year only;
+    ELSE IF agein <= year AND ageout < year+.999999 THEN inc = (ageout - year) +  1/(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *first part of year only;
+    ELSE IF agein > year AND ageout < year+.999999 THEN inc =  (ageout - agein) + 1/(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *mid-year year;
+    ELSE IF agein = year AND ageout = agein THEN inc = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
+    ELSE IF agein = year + 1-1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1) AND ageout = agein THEN inc = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
+    incbl=0;
+   END;
+   IF atrisk=0 THEN DO; *non of the period eligible (should be no partials);
+    IF agein <= year AND ageout >= year+.999999 THEN incbl =  1; *whole year;
+    ELSE IF agein > year AND ageout >= year+.999999 THEN incbl = (year+1 - agein) /*+ 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1)*/; *last part of year only;
+    ELSE IF agein <= year AND ageout < year+.999999 THEN incbl = (ageout - year) +  1/(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *first part of year only;
+    ELSE IF agein > year AND ageout < year+.999999 THEN incbl =  (ageout - agein) + 1/(MDY(12,31, year(dateout))-MDY(1,1, year(dateout)) + 1); *mid-year year;
+    ELSE IF agein = year AND ageout = agein THEN incbl = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
+    ELSE IF agein = year + 1-1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1) AND ageout = agein THEN incbl = 1/(MDY(12,31, year(datein))-MDY(1,1, year(datein)) + 1);*single day;
     inc=0;
    END;
    inc=incbl;
@@ -355,10 +421,11 @@ DATA exp_allwide (DROP=datein dateout wlmrt emp wlm  dob eligdate dlo agein ageo
  IF ageout<agein THEN err=1;
  IF agein<&agebegin THEN err=2;
  IF agein>&ageend OR ageout>&ageend THEN err=3;
- IF last.id THEN OUTPUT exp_allwide;
+ IF last.id THEN OUTPUT exp_blwide;
  IF err>.z THEN OUTPUT err;
  *OUTPUT TEST;
 RUN;
+
 
 DATA exp_003;
  SET exp_002;
@@ -368,6 +435,7 @@ DATA cpum.demo0001; MERGE demo hdate tdate baseline; BY id; IF priorwlm=. THEN p
 DATA cpum.hist0001; SET hist;
 DATA cpum.exp0001; SET exp_003;
 DATA cpum.exp0101; SET exp_allwide;
+DATA cpum.exp0102; SET exp_blwide;
 DATA cpum.exp0111; SET exp_eligwide; RUN;
 
 /*PROC MEANS DATA = exp_anywide;

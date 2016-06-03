@@ -1,5 +1,15 @@
 *.hpp
 *.csv
-run_bayes*
 .Rhistory
 *.textClipping
+*.R
+*.sas
+*.sh
+*.py
+*.sas7bdat
+*.R*
+*__py*
+*py
+!*bayesgf*
+
+~                            

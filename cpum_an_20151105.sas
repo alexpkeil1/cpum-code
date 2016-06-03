@@ -7,7 +7,7 @@
 * Data in: 
 * Data out:
 * Description: 
-* Released under the GNU General Public License: http://www.gnu.org/copyleft/gpl.html
+* Released under the GNU General PuBLic License: http://www.gnu.org/copyleft/gpl.html
 **********************************************************************************************************************/
 *clear the log window and the output window;
 DM LOG 'clear;' CONTINUE; DM OUT 'clear;' CONTINUE; 
@@ -25,41 +25,62 @@ LIBNAME cpum "&data";
 
 DATA vs; SET cpum.vs0001;
 DATA demo; SET cpum.demo0001;
-DATA expwide (RENAME=(cumwlm=oldcumwlm cumyrsexp=oldcumyrsexp)); SET cpum.exp0111;RUN;
+DATA expwide (RENAME=(cumwlm=oldcumwlm cumyrsexp=oldcumyrsexp)); 
+	*SET cpum.exp0111;
+	SET cpum.exp0111;
+RUN;
+DATA expBL (RENAME=(cumwlm=oldcumwlm cumyrsexp=oldcumyrsexp)); 
+	*SET cpum.exp0111;
+	SET cpum.exp0102;
+RUN;
 
 %LET censage=99;
 %MACRO lag(lag);
-  IF i>&LAG THEN DO;
-    yrsexp&lag.lag = MAX(0,pyexp[i-&LAG]*(ageout-agein));
-    yrsatwork&lag.lag = MAX(0, yrsatworkarr[i-&LAG]);    
-    atwork&lag.lag = (yrsatwork&lag.lag>0);
-    wlm&lag.lag = MAX(0,annwlm[i-&LAG]*(ageout-agein));
-    cumwlm&lag.lag = SUM(cumwlm&lag.lag, wlm&lag.lag);*add in partial-year exposure for those with early exits and a long enough exposure history;
-  END;
-  IF i>&LAG THEN cumyrsexp&lag.lag = SUM(cumyrsexp&lag.lag, yrsexp&lag.lag);
-  IF cumyrsexp&lag.lag>0 THEN avgwlm&lag.lag=cumwlm&lag.lag/cumyrsexp&lag.lag; ELSE avgwlm&lag.lag=0;
+  *need to handle 1 year lags specially due to inclusion of baseline expousre in totals;
+   IF i>&LAG  THEN DO;
+     ******;
+     yrsexp&lag.lag = MAX(0,pyexp[i-&LAG] + pyBLexp[i-&LAG]);
+     yrsatwork&lag.lag = MAX(0, yrsatworkarr[i-&LAG] + yrsatworkBLarr[i-&LAG]);    
+     wlm&lag.lag = MAX(0,annwlm[i-&LAG] + annBLwlm[i-&LAG]);
+	 *****;
+	 atwork&lag.lag = (yrsatwork&lag.lag>0);
+  	 IF MAX(0,yrsexp&lag.lag)>0 THEN wlmrt&lag.lag = MAX(0, MAX(0,wlm&lag.lag)/MAX(0,yrsexp&lag.lag));
+	 ELSE  wlmrt&lag.lag = 0;
+     cumwlm&lag.lag = SUM(cumwlm&lag.lag, wlm&lag.lag);
+	 cumyrsexp&lag.lag = SUM(cumyrsexp&lag.lag, yrsexp&lag.lag);
+	 IF ageout NE  agein+1 THEN DO;
+	  *ignore the fact that this is a partial year;
+ 	 END;
+   END;
+   IF cumyrsexp&lag.lag>0 THEN avgwlm&lag.lag=cumwlm&lag.lag/cumyrsexp&lag.lag; ELSE avgwlm&lag.lag=0;
 %MEND;
 %MACRO INITLAG(LAG);
-cumwlm&lag.lag=0;wlm&lag.lag=0; cumyrsexp&lag.lag=0; cumyrsatwork&lag.lag=0;yrsexp&lag.lag=0; avgwlm&lag.lag=0;atwork&lag.lag=0;
+cumwlm&lag.lag=0; wlmrt&lag.lag=0;wlm&lag.lag=0; cumyrsexp&lag.lag=0; cumyrsatwork&lag.lag=0;yrsexp&lag.lag=0; avgwlm&lag.lag=0;atwork&lag.lag=0;
 %MEND;
 
 
-DATA an0001 (KEEP=id ageout agein yob datein dateout cumwlm: eligage dod wlm yrsexp: cumyrsexp: atwork:
-                       avgwlm: d_: icd icdver eligdate  dlo agelo ageatadmincens dob bl_: py sex race cohort: smoke: date_fe termdate priorwlm ) 
+DATA an0001 (KEEP=id ageout agein yob datein dateout timein timeout cumwlm: eligage dod wlm wlmrt wlmrt: yrsexp: cumyrsexp: atwork:
+                       avgwlm: d_: icd icdver eligdate  dlo agelo ageatadmincens dob BL_: py sex race cohort: smoke: date_fe termdate priorwlm ) 
           ERR (KEEP= id  ageout dlo dob eligage wlm age_fe cumwlm); 
- LENGTH  id 8 agein ageout datein dateout d_lc d_any d_copd d_nonlc dob eligdate dlo dod  wlm cumwlm yrsexp cumyrsexp 8;
- MERGE vs(IN=invs) demo expwide ;
+ LENGTH  id 8 agein ageout datein dateout timein timeout d_lc d_any d_copd d_nonlc dob eligdate dlo dod  wlm wlmrt cumwlm yrsexp cumyrsexp 8;
+ MERGE vs(IN=invs) demo expwide expBL(KEEP = id annBL: pyBL: );
  BY id;
  IF dob <=.z OR dlo<=.z OR eligdate<=.z THEN OUTPUT err;
  ELSE DO;
 
- *AGES 8-99;
+ *AGES 8-99; *this will result in a lot of missingness warnings from ages after exposure but before censoring age;
  ARRAY annwlm[*] annwlm008-annwlm0&censage;
  ARRAY pyexp[*] pyexp008-pyexp0&censage;
  ARRAY yrsatworkarr[*] pyexp008-pyexp0&censage;
+ *everything that happens prior to study entry;
+ ARRAY annBLwlm[*] annBLwlm008-annBLwlm0&censage;
+ ARRAY pyBLexp[*] pyBLexp008-pyBLexp0&censage;
+ ARRAY yrsatworkBLarr[*] pyBLexp008-pyBLexp0&censage;
  cumwlm=0; cumyrsexp=0; cumyrsatwork=0;;yrsexp=0; d_lc=0; d_any=0; avgwlm=0;
   *%initLAG(0);*test;
+  %initLAG(1);
   %initLAG(2);
+  %initLAG(3);
   %initLAG(5);
   %initLAG(10);
   %initLAG(15);
@@ -84,7 +105,7 @@ DATA an0001 (KEEP=id ageout agein yob datein dateout cumwlm: eligage dod wlm yrs
  IF y_lc=. THEN y_lc=0;
  IF y_copd=. THEN y_copd=0;
  d_nonlc=0;
- *fix some recrods where the 'pybegin' variable from the raw data comes before the actual exposure date;
+ *fix some records where the 'pybegin' variable from the raw data comes before the actual exposure date;
  neweligage = eligage;
  IF age_fe>eligage THEN DO; neweligage=age_fe; err=2; END;
  DO i = 1 TO DIM(annwlm);
@@ -93,12 +114,33 @@ DATA an0001 (KEEP=id ageout agein yob datein dateout cumwlm: eligage dod wlm yrs
   datein = yob+agein;
   dateout = yob+ageout;
 
-  IF FLOOR(neweligage) = agein THEN agein = neweligage; *realign to start of first eligibility date;
+  IF FLOOR(neweligage) = agein THEN DO;
+   datein = datein + (neweligage-agein);
+   agein = neweligage; *realign to start of first eligibility date;
+  END;
+  IF agein >= neweligage THEN DO;
+  *time on study;
+   timein = agein-neweligage;
+   timeout = ageout-neweligage;
+  END;
   py = ageout-agein;
   yrsexp=MAX(0,pyexp[i]);
   yrsatwork = MAX(0, yrsatworkarr[i]);
   atwork = (yrsatwork>0);;
   wlm = MAX(0,annwlm[i]);
+
+  yrsexpBL=MAX(0,pyBLexp[i]);
+  yrsatworkBL = MAX(0, yrsatworkBLarr[i]);
+  atworkBL = (yrsatwork>0);;
+  wlmBL = MAX(0,annBLwlm[i]);
+
+  *temporarily add these in for cumulative + lagging;
+  wlm = wlm + wlmBL;
+  yrsexp = yrsexp + yrsexpBL;
+  yrsatwork = yrsatwork + yrsatworkBL;
+
+  IF yrsatwork>0 THEN wlmrt = wlm/yrsatwork;
+  ELSE wlmrt = 0;
   cumwlm = SUM(cumwlm, wlm);
     d_any = 0; d_lc=0; d_copd=0; d_nonlc=0;
   IF dod>.z THEN DO;
@@ -106,6 +148,7 @@ DATA an0001 (KEEP=id ageout agein yob datein dateout cumwlm: eligage dod wlm yrs
     d_any = y_any; d_lc=y_lc; d_copd=y_copd; d_nonlc=d_any-d_lc;
     ageout = YRDIF(dob,dod, 'ACT/ACT');
 	dateout = yob+ageout;
+	timeout = ageout-neweligage;
    END;
   END;
    ELSE IF dlo>.z THEN DO;
@@ -113,21 +156,30 @@ DATA an0001 (KEEP=id ageout agein yob datein dateout cumwlm: eligage dod wlm yrs
     d_any = y_any; d_lc=y_lc; d_copd=y_copd; d_nonlc=d_any-d_lc;
     ageout = YRDIF(dob,dlo, 'ACT/ACT');
 	dateout = yob+ageout;
+	timeout = ageout-neweligage;
    END;
   END;
 cumyrsexp = SUM(cumyrsexp, yrsexp);
 cumyrsatwork = SUM(cumyrsatwork, yrsatwork);
 IF cumyrsexp>0 THEN avgwlm=cumwlm/cumyrsexp; ELSE avgwlm=0;
   *%LAG(0);*test;
+  %LAG(1);
   %LAG(2);
+  %LAG(3);
   %LAG(5);
   %LAG(10);
   %LAG(15);
   %LAG(20);
   %LAG(25);
+  *subtract back out(these will not be output if only BL);
 
-  IF dlo>.z AND eligdate>.z AND agein>.z AND 
-   neweligage<=agein<YRDIF(dob, dlo, 'ACT/ACT') THEN OUTPUT an0001;
+   IF dlo>.z AND eligdate>.z AND agein>.z AND neweligage<=agein<YRDIF(dob, dlo, 'ACT/ACT') THEN DO;
+    wlm = wlm - wlmBL;
+    yrsexp = yrsexp - yrsexpBL;
+    yrsatwork = yrsatwork - yrsatworkBL;
+
+	OUTPUT an0001;
+   END;
    IF err>.z THEN output err;
  END;
   ;
@@ -136,7 +188,7 @@ RUN;
 
 
 
-*create leave work variable;
+*create leave work variaBLe;
 /*PROC SORT DATA = an0001; BY id DESCENDING agein;
 DATA an0001 (DROP=lastwork); 
   SET an0001;
@@ -183,7 +235,7 @@ DATA firstwork (KEEP=ID);
  IF first.id AND atwork=0 THEN OUTPUT;
 
 DATA firstworkers;
- MERGE an0001 (KEEP=id agein ageout atwork wlm py bl_:) firstwork (IN=inb);
+ MERGE an0001 (KEEP=id agein ageout atwork wlm py BL_:) firstwork (IN=inb);
  BY id;
  IF inb;
 RUN;
