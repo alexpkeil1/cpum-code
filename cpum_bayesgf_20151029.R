@@ -27,8 +27,8 @@ an <- read_sas("~/EpiProjects/CPUM/data/an0001.sas7bdat")
 #variables to keep
 #restrict to nonwhites
 switch=0 #indicator to help avoid running a problem below with defining exposures after baseline if running multiple times
-dim(dat <- an[an$race==2 & !is.na(an$smoke3_2),])
-#dim(dat <- an[!is.na(an$smoke3_2),]) #keep everybody with non-missing smoking data
+#dim(dat <- an[an$race==2 & !is.na(an$smoke3_2),])
+dim(dat <- an[!is.na(an$smoke3_2),]) #keep everybody with non-missing smoking data
 
 
 dat$maxage = pmin(90, ceiling(dat$ageatadmincens))

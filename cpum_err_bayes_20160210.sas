@@ -23,8 +23,8 @@ OPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';
 LIBNAME cpum "&data";
 
 DATA an;
-* SET cpum.an0001(WHERE=(smoke3_2>.z AND race=2));
- SET cpum.an0001(WHERE=(smoke3_2>.z));
+ SET cpum.an0001(WHERE=(smoke3_2>.z AND race=2));
+* SET cpum.an0001(WHERE=(smoke3_2>.z));
 
 PROC NLMIXED DATA=an ;
  TITLE "ERR model - PROC NLMIXED";
@@ -33,7 +33,7 @@ PROC NLMIXED DATA=an ;
  ODS OUTPUT parameterestimates = nlmixed;
 RUN;
 
-PROC MCMC DATA = an/* SEED = 12123*/ NMC = 10000 OUTPOST=dpost 
+PROC MCMC DATA = an/* SEED = 12123*/ NMC = 10000 OUTPOST=dpost PLOTS=none 
 MONITOR=(a0 err);
  TITLE "ERR model, lung cancer";
  ODS SELECT PostSumInt ESS TADPanel;
@@ -42,17 +42,18 @@ MONITOR=(a0 err);
  PRIOR a0 ~ GENERAL(0);
  PRIOR err ~ GENERAL(0);
  *PRIOR a0 ~ NORMAL(0, var=100); 
- *PRIOR err~ NORMAL(1, var=4, lower=-1);
+ *PRIOR err~ NORMAL(10, var=10, lower=0); * causes segfault - f-sas;
 
 *err model;
-  mu = py/10000*exp(a0)*(1 + err*cumwlm2lag/100);
-  MODEL d_lc ~ BINARY(mu);
+  mu = (py/10000*exp(a0)*(1 + err*cumwlm2lag/100));
+  MODEL d_lc ~ POISSON(mu);
 RUN;
 
-PROC MEANS DATA = dpost MEDIAN P5 P95;
+PROC UNIVARIATE DATA = dpost NOPRINT;
  VAR a0 err;
+ OUTPUT OUT = pct pctlpts = 50 2.5 97.5 pctlpre = a0_ err_; 
 RUN;
-
+PROC PRINT DATA = pct;RUN;
 
 RUN;QUIT;RUN;
 /*DM ODSRESULTS 'clear;' CONTINUE; *clear ODS generated datasets;*/
